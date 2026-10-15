@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeRace — Classroom Typing Race</title>
+<style>
+html[data-theme="dark"] {
+  --bg:#0d0f14;--bg2:#141720;--bg3:#1a1d27;--border:#2a2d38;--border2:#3a3f50;
+  --text:#e8eaf0;--text2:#9ba3b8;--text3:#6b7280;--text4:#4a4f60;
+  --accent:#f5d94e;--accent-bg:#1a1700;--accent-border:#4a3d00;
+  --green:#4ade80;--green-bg:#0a2210;--green-border:#1a5a30;
+  --blue:#60a5fa;--blue-bg:#0a1a2e;--blue-border:#1a3a6e;
+  --red:#ef4444;--red-bg:#2d0808;
+  --card-bg:#141720;--input-bg:#0d0f14;--track-bg:#1a1d27;--logo-sub:#e8eaf0;
+  --purple:#a78bfa;--purple-bg:#1a1027;
+}
+html[data-theme="light"] {
+  --bg:#f4f5f7;--bg2:#ffffff;--bg3:#eef0f4;--border:#d1d5db;--border2:#9ca3af;
+  --text:#111827;--text2:#374151;--text3:#6b7280;--text4:#9ca3af;
+  --accent:#b8860b;--accent-bg:#fef9e7;--accent-border:#f0d060;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --card-bg:#ffffff;--input-bg:#f9fafb;--track-bg:#e5e7eb;--logo-sub:#374151;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Times New Roman',Times,serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .2s,color .2s;}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+.header{background:var(--bg);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:52px;position:sticky;top:0;z-index:50;}
+.logo{font-size:18px;font-weight:700;letter-spacing:-.5px;color:var(--accent);}
+.logo span{color:var(--logo-sub);font-weight:400;}
+.logo-room{font-size:13px;color:var(--text3);margin-left:10px;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.user-pill{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:13px;color:var(--text2);}
+.user-pill strong{color:var(--text);}
+.theme-btn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:16px;cursor:pointer;line-height:1;}
+.nav-tabs{display:flex;gap:4px;padding:12px 1.5rem 0;border-bottom:1px solid var(--border);background:var(--bg);overflow-x:auto;}
+.tab-btn{background:none;border:none;cursor:pointer;padding:8px 16px;font-size:14px;color:var(--text3);border-bottom:2px solid transparent;transition:color .15s,border-color .15s;margin-bottom:-1px;font-family:inherit;white-space:nowrap;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn:hover:not(.active){color:var(--text2);}
+.main{padding:1.5rem;max-width:960px;margin:0 auto;}
+.page{display:none;}.page.active{display:block;}
+.screen-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:var(--bg);}
+.login-card{background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:2.5rem 2rem;width:100%;max-width:440px;}
+.login-card h1{font-size:26px;font-weight:700;margin-bottom:4px;color:var(--accent);}
+.login-card .sub{font-size:14px;color:var(--text3);margin-bottom:1.5rem;}
+.room-badge{display:inline-block;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:6px;padding:3px 10px;font-size:13px;margin-bottom:1.25rem;}
+.field-label{font-size:13px;color:var(--text2);margin-bottom:6px;display:block;}
+.field-input{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:15px;color:var(--text);outline:none;transition:border-color .15s;font-family:inherit;}
+.field-input:focus{border-color:var(--accent);}
+.field-group{margin-bottom:1rem;}
+.btn-primary{width:100%;background:var(--accent);color:#0d0f14;font-weight:700;border:none;border-radius:8px;padding:13px;font-size:15px;cursor:pointer;margin-top:.5rem;transition:opacity .15s;font-family:inherit;}
+.btn-primary:hover{opacity:.9;}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:inherit;}
+.btn-outline:hover{border-color:var(--border2);color:var(--text);}
+.btn-sm{background:var(--bg3);border:1px solid var(--border);color:var(--text2);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.btn-sm:hover{background:var(--border);color:var(--text);}
+.btn-link{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit;margin-top:12px;display:block;text-align:center;}
+.role-toggle{display:flex;gap:8px;margin-bottom:1.25rem;}
+.role-btn{flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:13px;color:var(--text3);cursor:pointer;text-align:center;font-family:inherit;}
+.role-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg);}
+.emoji-label{font-size:13px;color:var(--text2);margin-bottom:8px;display:block;}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem;}
+.emoji-opt{font-size:22px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;border:2px solid transparent;background:var(--bg3);transition:all .12s;user-select:none;}
+.emoji-opt:hover{background:var(--border);transform:scale(1.1);}
+.emoji-opt.selected{border-color:var(--accent);background:var(--accent-bg);}
+/* Race track */
+.race-track-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.race-track-title{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;}
+.track-lane{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.track-lane:last-child{margin-bottom:0;}
+.lane-label{width:110px;font-size:13px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:5px;}
+.lane-label.me-label{color:var(--accent);font-weight:600;}
+.track-bar{flex:1;background:var(--track-bg);border-radius:20px;height:28px;position:relative;overflow:hidden;}
+.track-runner{position:absolute;top:0;height:100%;display:flex;align-items:center;transition:left .4s ease;pointer-events:none;}
+.track-runner-emoji{font-size:20px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));}
+.track-finish{position:absolute;right:0;top:0;height:100%;width:3px;background:var(--accent);border-radius:0 20px 20px 0;}
+.track-pct{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text3);}
+.track-runner-done .track-runner-emoji{filter:drop-shadow(0 0 4px gold);}
+/* Race UI */
+.race-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:8px;}
+.race-title{font-size:18px;font-weight:500;}
+.status-badge{font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500;}
+.badge-waiting{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border);}
+.badge-racing{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-done{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);}
+.race-text-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem;font-family:'Courier New',Courier,monospace;font-size:18px;line-height:1.8;min-height:80px;word-break:normal;overflow-wrap:break-word;white-space:pre-wrap;}
+.char-correct{color:var(--green);}
+.char-wrong{color:var(--red);background:var(--red-bg);border-radius:2px;}
+.char-current{background:var(--accent);color:#0d0f14;border-radius:2px;animation:blink .8s ease-in-out infinite;}
+.char-pending{color:var(--text4);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.typing-input{width:100%;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-size:16px;font-family:'Courier New',monospace;color:var(--text);outline:none;resize:none;transition:border-color .15s;margin-bottom:1rem;}
+.typing-input:focus{border-color:var(--accent);}
+.typing-input:disabled{opacity:.4;cursor:not-allowed;}
+.progress-wrap{background:var(--track-bg);border-radius:4px;height:6px;margin-bottom:1.5rem;overflow:hidden;}
+.progress-bar{height:100%;background:var(--accent);border-radius:4px;transition:width .3s ease;}
+.stats-row{display:flex;gap:12px;margin-bottom:1.5rem;flex-wrap:wrap;}
+.stat-card{flex:1;min-width:80px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center;}
+.stat-val{font-size:22px;font-weight:600;color:var(--accent);}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:.04em;}
+.lb-card{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.lb-head{display:flex;padding:10px 16px;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border);}
+.lb-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--bg3);transition:background .1s;}
+.lb-row:last-child{border-bottom:none;}
+.lb-row:hover{background:var(--bg3);}
+.lb-row.me{background:var(--accent-bg);}
+.lb-rank{width:36px;font-size:13px;color:var(--text3);flex-shrink:0;}
+.lb-rank.gold{color:#f5d94e;font-weight:700;}
+.lb-rank.silver{color:#a0a0a0;font-weight:600;}
+.lb-rank.bronze{color:#cd7f32;font-weight:600;}
+.lb-name{flex:1;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-wpm{width:70px;text-align:right;font-size:14px;font-weight:500;color:var(--accent);flex-shrink:0;}
+.lb-acc{width:60px;text-align:right;font-size:14px;color:var(--green);flex-shrink:0;}
+.lb-time{width:70px;text-align:right;font-size:13px;color:var(--text3);flex-shrink:0;}
+.empty-state{padding:2rem;text-align:center;color:var(--text4);font-size:14px;}
+.host-section{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.host-section h3{font-size:13px;font-weight:600;margin-bottom:1rem;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;}
+.sentence-list{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+.sentence-item{display:flex;align-items:center;gap:8px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.sentence-item.active-sentence{border-color:var(--accent);}
+.sentence-text{flex:1;font-size:13px;color:var(--text2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.add-sentence-wrap{display:flex;gap:8px;}
+.add-input{flex:1;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none;transition:border-color .15s;font-family:inherit;}
+.add-input:focus{border-color:var(--accent);}
+.share-box{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin-top:.75rem;}
+.share-url{flex:1;font-size:13px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.copy-btn{background:var(--accent);color:#0d0f14;border:none;border-radius:6px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;}
+.copy-btn:hover{opacity:.85;}
+.notice{font-size:12px;color:var(--text4);margin-top:8px;}
+.race-controls{display:flex;gap:8px;flex-wrap:wrap;}
+.btn-start{background:var(--green);color:#0a1a0d;border:none;border-radius:8px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-start:hover{opacity:.9;}
+.btn-started{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);border-radius:8px;padding:11px 28px;font-size:14px;font-weight:700;cursor:default;font-family:inherit;}
+.btn-reset{background:none;border:1px solid var(--border);color:var(--text3);border-radius:8px;padding:11px 20px;font-size:14px;cursor:pointer;font-family:inherit;}
+.btn-reset:hover{border-color:var(--border2);color:var(--text2);}
+.export-btn{background:none;border:1px solid var(--border);color:var(--text2);border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:inherit;}
+.export-btn:hover{border-color:var(--border2);color:var(--text);}
+.btn-del{background:none;border:1px solid #7f1d1d;color:var(--red);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit;flex-shrink:0;}
+.btn-del:hover{background:var(--red-bg);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-size:14px;color:var(--text);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.countdown{font-size:64px;font-weight:800;color:var(--accent);text-align:center;padding:.5rem 0 1rem;letter-spacing:-3px;display:none;}
+.divider{border:none;border-top:1px solid var(--border);margin:1.25rem 0;}
+select.field-select{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none;appearance:none;font-family:inherit;cursor:pointer;}
+select.field-select:focus{border-color:var(--accent);}
+.live-count{font-size:12px;color:var(--text4);margin-top:6px;}
+.room-row{display:flex;align-items:center;gap:10px;background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;}
+.room-row-name{flex:1;font-size:15px;}
+.room-row-link{font-size:12px;color:var(--text4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px;}
+.connecting{text-align:center;padding:3rem;color:var(--text3);font-size:16px;}
+.timer-urgent{color:var(--red)!important;animation:pulse .5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+/* Analytics */
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+@media(max-width:640px){.analytics-grid{grid-template-columns:1fr;}}
+.stat-block{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem;}
+.stat-block h4{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;}
+.desc-table{width:100%;border-collapse:collapse;font-size:13px;}
+.desc-table td{padding:5px 8px;border-bottom:1px solid var(--border);}
+.desc-table td:first-child{color:var(--text3);}
+.desc-table td:last-child{text-align:right;font-weight:600;color:var(--text);}
+.desc-table tr:last-child td{border-bottom:none;}
+.chart-wrap{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem;overflow:hidden;}
+.chart-wrap h4{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.bar-fill{width:100%;border-radius:4px 4px 0 0;transition:height .4s ease;min-height:4px;background:var(--accent);}
+.bar-label{font-size:10px;color:var(--text3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60px;}
+.bar-val{font-size:10px;color:var(--text2);font-weight:600;}
+.class-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem;}
+.class-tab{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text2);}
+.class-tab.active{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);}
+.student-table{width:100%;border-collapse:collapse;font-size:13px;}
+.student-table th{padding:8px 10px;text-align:left;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);font-weight:600;}
+.student-table td{padding:9px 10px;border-bottom:1px solid var(--border2);}
+.student-table tr:last-child td{border-bottom:none;}
+.student-table tr:hover td{background:var(--bg3);}
+.growth-svg{width:100%;height:120px;overflow:visible;}
+.trend-line{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;}
+.trend-dot{fill:var(--accent);}
+.trend-area{fill:var(--accent);opacity:.1;}
+/* Password notice */
+.pw-notice{background:var(--blue-bg);border:1px solid var(--blue-border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--blue);margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- HOME -->
+<div id="screenHome" class="screen-wrap" style="display:none;">
+  <div class="login-card">
+    <h1>TypeRace 🏁</h1>
+    <p class="sub">Live classroom typing races.</p>
+    <div style="text-align:right;margin-bottom:1rem;">
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">☀️</button>
+    </div>
+    <div class="role-toggle">
+      <div class="role-btn active" id="roleStudent" onclick="setRole('student')">Student / Racer</div>
+      <div class="role-btn" id="roleHost" onclick="setRole('host')">Host / Teacher</div>
+    </div>
+    <div id="studentNoRoom">
+      <p style="font-size:14px;color:var(--text3);margin-bottom:1rem;">Ask your teacher for the room link, or enter a room name below.</p>
+      <div class="field-group">
+        <label class="field-label">Room name</label>
+        <input class="field-input" id="studentRoomInput" type="text" placeholder="e.g. Grade7A" maxlength="40"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Class</label>
+        <select class="field-input" id="studentClassHome" onchange="populateStudentIdDropdown('studentClassHome','studentIdHome')">
+          <option value="">— Select your class —</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Student ID</label>
+        <select class="field-input" id="studentIdHome">
+          <option value="">— Select your ID —</option>
+        </select>
+      </div>
+      <label class="emoji-label">Choose your race emoji</label>
+      <div class="emoji-grid" id="emojiGridHome"></div>
+      <button class="btn-primary" onclick="joinRoomDirect()">Join Room →</button>
+    </div>
+    <div id="hostNoRoom" style="display:none;">
+      <div class="field-group">
+        <label class="field-label">Host password</label>
+        <input class="field-input" id="hostPwHome" type="password" placeholder="Your host password"/>
+      </div>
+      <button class="btn-primary" onclick="goToHostDashboard()">Open Host Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOST DASHBOARD -->
+<div id="screenHostDash" class="screen-wrap" style="display:none;">
+  <div class="login-card" style="max-width:540px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <h1 style="margin-bottom:0;">Host Dashboard</h1>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtnDash">☀️</button>
+    </div>
+    <p class="sub">Create a room for each class. Each gets its own unique link.</p>
+    <div class="field-group">
+      <label class="field-label">Create a new room</label>
+      <div style="display:flex;gap:8px;">
+        <input class="field-input" id="newRoomInput" type="text" placeholder="e.g. Grade7A, Period3" maxlength="40" style="flex:1;"/>
+        <button class="btn-sm" onclick="createRoom()" style="padding:10px 16px;">Create</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <h3 style="font-size:13px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">Your rooms</h3>
+    <div id="roomsGrid"><div class="empty-state" style="padding:1rem;">Loading…</div></div>
+    <div class="divider"></div>
+    <button class="btn-link" onclick="showScreen('screenHome')">← Back</button>
+  </div>
+</div>
+
+<!-- ROOM LOGIN -->
+<div id="screenRoomLogin" class="screen-wrap" style="display:none;">
+  <div class="login-card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <h1 style="margin-bottom:0;">TypeRace 🏁</h1>
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtnLogin">☀️</button>
+    </div>
+    <div class="room-badge" id="loginRoomBadge">Room: —</div>
+    <p class="sub">Enter your details to join the race.</p>
+    <div class="role-toggle">
+      <div class="role-btn active" id="roleStudentRoom" onclick="setRoleRoom('student')">Student / Racer</div>
+      <div class="role-btn" id="roleHostRoom" onclick="setRoleRoom('host')">Host / Teacher</div>
+    </div>
+    <!-- Student class + ID dropdowns (shown for student role) -->
+    <div id="studentClassIdSection">
+      <div class="field-group">
+        <label class="field-label">Class</label>
+        <select class="field-input" id="loginClassSelect" onchange="populateStudentIdDropdown('loginClassSelect','loginIdSelect'); checkStudentPwFromDropdown()">
+          <option value="">— Select your class —</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Student ID</label>
+        <select class="field-input" id="loginIdSelect" onchange="checkStudentPwFromDropdown()">
+          <option value="">— Select your ID —</option>
+        </select>
+      </div>
+    </div>
+    <!-- Host ID field (shown for host role) -->
+    <div class="field-group" id="hostIdField" style="display:none;">
+      <label class="field-label" id="loginIdLabel">Host / Teacher ID</label>
+      <input class="field-input" id="userIdInput" type="text" placeholder="e.g. Teacher" maxlength="40" autocomplete="off"/>
+    </div>
+    <!-- Student password section (shown after ID entered) -->
+    <div id="studentPwSection" style="display:none;">
+      <div id="studentPwNotice" class="pw-notice" style="display:none;"></div>
+      <div class="field-group">
+        <label class="field-label" id="studentPwLabel">Password</label>
+        <input class="field-input" id="studentPwInput" type="password" placeholder="Your password" maxlength="60"/>
+      </div>
+    </div>
+    <div id="emojiPickerSection">
+      <label class="emoji-label">Choose your race emoji</label>
+      <div class="emoji-grid" id="emojiGridLogin"></div>
+    </div>
+    <div class="field-group" id="hostPwField" style="display:none;">
+      <label class="field-label">Host password</label>
+      <input class="field-input" id="hostPwInput" type="password" placeholder="Set or enter host password"/>
+      <div class="notice" style="margin-top:6px;">First time? Any password becomes the host password for this room.</div>
+    </div>
+    <button class="btn-primary" onclick="doLogin()" id="loginBtn">Enter Race →</button>
+    <button class="btn-link" onclick="showScreen('screenHome')">← Choose a different room</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none;">
+  <div class="header">
+    <div style="display:flex;align-items:center;">
+      <div class="logo">Type<span>Race</span></div>
+      <span class="logo-room" id="headerRoom"></span>
+    </div>
+    <div class="header-right">
+      <button class="theme-btn" onclick="toggleTheme()" id="themeBtnApp">☀️</button>
+      <div class="user-pill"><span id="headerEmoji"></span> <strong id="headerUser"></strong></div>
+      <button class="btn-outline" onclick="doLogout()">Leave</button>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('race')" id="tabRace">Race</button>
+    <button class="tab-btn" onclick="showTab('leaderboard')" id="tabLeaderboard">Leaderboard</button>
+    <button class="tab-btn" id="tabHostBtn" onclick="showTab('host')" style="display:none;">Host Controls</button>
+    <button class="tab-btn" id="tabAnalyticsBtn" onclick="showTab('analytics')" style="display:none;">Analytics</button>
+  </div>
+  <div class="main">
+
+    <!-- RACE TAB -->
+    <div class="page active" id="pageRace">
+      <div class="race-header">
+        <div class="race-title" id="raceTitle">Connecting…</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="status-badge badge-waiting" id="raceHeaderTimer" style="display:none;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border);font-weight:700;">⏱ —</div>
+          <div class="status-badge badge-waiting" id="statusBadge">Waiting</div>
+        </div>
+      </div>
+      <div class="countdown" id="countdown"></div>
+      <div class="race-track-card" id="raceTrackCard" style="display:none;">
+        <div class="race-track-title">Race track</div>
+        <div id="trackLanes"></div>
+      </div>
+      <div class="race-text-card" id="raceTextDisplay">
+        <span style="color:var(--text4);">The race text will appear here once the host starts.</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="myProgress" style="width:0%"></div></div>
+      <textarea class="typing-input" id="typingInput" rows="2" placeholder="Start typing here when the race begins…" disabled></textarea>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-val" id="statWpm">0</div><div class="stat-lbl">WPM</div></div>
+        <div class="stat-card"><div class="stat-val" id="statAcc">100%</div><div class="stat-lbl">Accuracy</div></div>
+        <div class="stat-card"><div class="stat-val" id="statPos">—</div><div class="stat-lbl">Position</div></div>
+        <div class="stat-card"><div class="stat-val" id="statTimeLeft" style="color:var(--green);">—</div><div class="stat-lbl">Time left</div></div>
+      </div>
+      <div class="live-count" id="liveCount"></div>
+    </div>
+
+    <!-- LEADERBOARD TAB -->
+    <div class="page" id="pageLeaderboard">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-size:18px;font-weight:500;">Leaderboard</h2>
+        <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="lb-card">
+        <div class="lb-head">
+          <span style="width:36px">#</span><span style="flex:1">Student</span>
+          <span style="width:70px;text-align:right">WPM</span>
+          <span style="width:60px;text-align:right">Acc</span>
+          <span style="width:60px;text-align:right">Score</span>
+          <span style="width:70px;text-align:right">Time</span>
+          <span style="width:70px;text-align:right">Race #</span>
+          <span style="width:36px;text-align:right">Del</span>
+        </div>
+        <div id="lbRows"><div class="empty-state">No results yet.</div></div>
+      </div>
+    </div>
+
+    <!-- HOST TAB -->
+    <div class="page" id="pageHost">
+      <div class="host-section">
+        <h3>Students in this room <span id="joinedCount" style="color:var(--accent);font-weight:700;"></span></h3>
+        <div id="joinedList" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px;">
+          <span style="font-size:14px;color:var(--text4);">No students yet.</span>
+        </div>
+        <div class="notice">Updates live as students join.</div>
+      </div>
+      <div class="host-section">
+        <h3>Room link for this class</h3>
+        <p style="font-size:14px;color:var(--text2);">Share this link — it only opens this room.</p>
+        <div class="share-box">
+          <span class="share-url" id="shareUrl">Loading…</span>
+          <button class="copy-btn" onclick="copyLink()">Copy link</button>
+        </div>
+        <div class="notice">Students only need their ID and password to enter.</div>
+      </div>
+      <div class="host-section">
+        <h3>Race controls</h3>
+        <div class="field-group" style="margin-bottom:1rem;">
+          <label class="field-label">Sentence for next race <span style="color:var(--text4);font-weight:400;font-size:12px;">(up to 150 words)</span></label>
+          <textarea class="add-input" id="sentenceSelect" rows="4" placeholder="Type or paste the sentence / passage here…" maxlength="2000" style="resize:vertical;width:100%;font-size:14px;line-height:1.6;"></textarea>
+          <div id="wordCountDisplay" style="font-size:12px;color:var(--text4);margin-top:4px;text-align:right;">0 words</div>
+        </div>
+        <div class="field-group" style="margin-bottom:1rem;">
+          <label class="field-label">Race timer (optional)</label>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input class="field-input" id="timerMinutes" type="number" min="0" max="60" value="2" style="width:70px;text-align:center;"/>
+              <span style="color:var(--text2);font-size:14px;">min</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <input class="field-input" id="timerSeconds" type="number" min="0" max="59" value="0" style="width:70px;text-align:center;"/>
+              <span style="color:var(--text2);font-size:14px;">sec</span>
+            </div>
+            <span style="font-size:12px;color:var(--text4);">Set to 0:00 for no timer</span>
+          </div>
+        </div>
+        <div id="hostTimerDisplay" style="display:none;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:12px 16px;margin-bottom:1rem;align-items:center;justify-content:space-between;">
+          <span style="font-size:13px;color:var(--text2);">Time remaining</span>
+          <span id="hostTimerVal" style="font-size:28px;font-weight:700;color:var(--accent);letter-spacing:-1px;">—</span>
+        </div>
+        <div class="race-controls">
+          <button class="btn-start" id="startRaceBtn" onclick="startRace()">▶ Start race</button>
+          <button class="btn-reset" onclick="resetRace()">Reset / Waiting</button>
+          <button class="btn-reset" onclick="clearResults()">Clear all results</button>
+        </div>
+      </div>
+      <div class="host-section">
+        <h3>Results this session</h3>
+        <div id="hostResults"><div class="empty-state">No results yet.</div></div>
+        <div class="divider"></div>
+        <button class="export-btn" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="host-section">
+        <h3>Class roster management</h3>
+        <div class="class-tabs" id="rosterClassTabs"></div>
+        <div id="rosterContent"></div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          <input class="add-input" id="newClassName" type="text" placeholder="New class name…" maxlength="40" style="flex:1;min-width:140px;"/>
+          <button class="btn-sm" onclick="addNewClass()" style="padding:10px 16px;">Add class</button>
+        </div>
+        <div id="addStudentToClassWrap" style="display:none;">
+          <label class="field-label" style="margin-top:8px;">Add student to <strong id="addStudentClassName"></strong></label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input class="add-input" id="newStudentId" type="text" placeholder="Student ID (e.g. 24KS1004)" maxlength="40" style="flex:1;min-width:140px;"/>
+            <button class="btn-sm" onclick="addStudentToClass()" style="padding:10px 16px;">Add student</button>
+          </div>
+        </div>
+      </div>
+      <div class="host-section">
+        <h3>All rooms</h3>
+        <div id="allRoomsGrid"></div>
+        <div class="divider"></div>
+        <div style="display:flex;gap:8px;">
+          <input class="add-input" id="newRoomFromHost" type="text" placeholder="New room name…" maxlength="40" style="flex:1;"/>
+          <button class="btn-sm" onclick="createRoomFromHost()" style="padding:10px 16px;">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS TAB -->
+    <div class="page" id="pageAnalytics">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:12px;">
+        <h2 style="font-size:18px;font-weight:500;">Class Analytics</h2>
+        <button class="export-btn" onclick="exportAnalyticsCSV()">⬇ Export CSV</button>
+      </div>
+
+      <!-- Class comparison bar chart -->
+      <div class="chart-wrap">
+        <h4>Average WPM by class</h4>
+        <div class="bar-chart" id="classCompareChart"></div>
+      </div>
+
+      <!-- Class selector -->
+      <div class="class-tabs" id="analyticsClassTabs" style="margin-bottom:1rem;"></div>
+
+      <!-- Per-class stats -->
+      <div id="analyticsClassContent">
+        <div class="empty-state">Select a class above to see detailed analytics.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, push, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDifH57zKJGqpHjSVWz9NfHW56fD0zSK1w",
+  authDomain: "typerace-57218.firebaseapp.com",
+  databaseURL: "https://typerace-57218-default-rtdb.firebaseio.com",
+  projectId: "typerace-57218",
+  storageBucket: "typerace-57218.firebasestorage.app",
+  messagingSenderId: "1040774198052",
+  appId: "1:1040774198052:web:165fe2a32476e1930c79b1"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// ── Pre-defined class rosters ─────────────────────────────────────────────────
+const DEFAULT_CLASSES = {
+  'Tue 1': ['23KS1025','24KS1004','24KS1006','24KS1016','24KS1064','24KS1068','24KS1083','24KS1094','24KS1102','24KS1132','24KS1157','24KS1183','24KS1189','24KS1196','24KS1198','24KS1249','24KS1251','24KS1258','24KS1261','24KS1269','24KS1304'],
+  'Tue2 Fri2': ['23KS1200','25KS1225','26KS1006','26KS1014','26KS1032','26KS1044','26KS1046','26KS1060','26KS1067','26KS1087','26KS1089','26KS1091','26KS1093','26KS1101','26KS1120','26KS1153','26KS1168','26KS1179','26KS1182','26KS1184','26KS1189','26KS1239','26KS1255'],
+  'Tue3 Fri3': ['24KS1250','25KS1025','25KS1066','25KS1079','25KS1095','1X24B120','1W241093','1W242236','1W252069','1W252092','1W252103','1W252112','1W252116','1W252136','1W252183','1W252221','1W252234','1W252237','1Y23B065','1Y24F137','1Y25D031','1Y25D033','1Y25D051','1Y25D062','1Y25D075','1Y25D084','1Y25D096','1Y25D102','1Y25D104','1Y25D108','1Y25D111','1Y25D121','1Y25D128','1Y25D141'],
+  'Fri 5': ['25KS1105','25KS1138','25KS1139','25KS1143','25KS1151','25KS1157','25KS1170','25KS1183','25KS1185','25KS1201','25KS1218','25KS1227']
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+const EMOJIS = ['🐶','🐱','🦊','🐻','🐼','🐨','🐯','🦁','🐸','🐙','🦋','🐢','🦄','🐳','🦅','🐉','🌟','🔥','⚡','🎯','🚀','🎸','🌈','🍕'];
+let myId='', myEmoji='🐶', myRole='student', hostPassword='';
+let currentRoom='';
+let typingStartTime=null, typingTimer=null;
+let currentText='', raceStarted=false, myFinished=false, raceNum=0;
+let totalKeystrokes=0, correctKeystrokes=0;
+let unsubscribeState=null, unsubscribeRacers=null, unsubscribeJoined=null, unsubscribeResults=null, unsubscribeRooms=null, unsubscribeSentences=null, unsubscribeClasses=null;
+let raceTimerInterval=null;
+let cachedSentences=[], cachedState=null, cachedRacers={}, cachedJoined={}, cachedResults=[];
+let cachedClasses={};
+let activeRosterClass='', activeAnalyticsClass='';
+
+function stateRef(room)       { return ref(db, 'rooms/' + room + '/state'); }
+function racersRef(room)      { return ref(db, 'rooms/' + room + '/racers'); }
+function racerRef(room, id)   { return ref(db, 'rooms/' + room + '/racers/' + safeid(id)); }
+function joinedRef(room)      { return ref(db, 'rooms/' + room + '/joined'); }
+function joinedUserRef(r, id) { return ref(db, 'rooms/' + r + '/joined/' + safeid(id)); }
+function resultsRef(room)     { return ref(db, 'rooms/' + room + '/results'); }
+function sentencesRef(room)   { return ref(db, 'rooms/' + room + '/sentences'); }
+function roomsIndexRef()      { return ref(db, 'roomsIndex'); }
+function classesRef()         { return ref(db, 'classes'); }
+function classRef(name)       { return ref(db, 'classes/' + safeid(name)); }
+function studentPwRef(id)     { return ref(db, 'students/' + safeid(id) + '/password'); }
+function studentResultsRef(id){ return ref(db, 'students/' + safeid(id) + '/results'); }
+function safeid(s)            { return String(s).replace(/[.#$\[\]\/]/g, '_'); }
+function esc(s)               { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function getRoomUrl(room)     { return window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(room); }
+function getRoomFromUrl()     { return slugify(new URLSearchParams(window.location.search).get('room') || ''); }
+function slugify(s)           { return s.trim().replace(/[^a-zA-Z0-9\-_]/g,'').substring(0,40); }
+function isValidStudentId(s)  { const parts=s.trim().split(/\s+/).filter(Boolean); return parts.length >= 2; }
+
+// ── Theme ─────────────────────────────────────────────────────────────────────
+function getTheme() { return localStorage.getItem('typerace-theme') || 'dark'; }
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  const icon = t==='dark' ? '☀️' : '🌙';
+  ['themeBtn','themeBtnDash','themeBtnLogin','themeBtnApp'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=icon; });
+  localStorage.setItem('typerace-theme', t);
+}
+window.toggleTheme = () => applyTheme(getTheme()==='dark' ? 'light' : 'dark');
+
+// ── Emoji grid ────────────────────────────────────────────────────────────────
+function buildEmojiGrid(containerId) {
+  const el = document.getElementById(containerId); if(!el) return;
+  el.innerHTML = EMOJIS.map((e,i) =>
+    `<div class="emoji-opt${i===0?' selected':''}" data-emoji="${e}" onclick="window.selectEmoji(this,'${e}','${containerId}')">${e}</div>`
+  ).join('');
+}
+window.selectEmoji = (el, emoji, containerId) => {
+  document.querySelectorAll('#'+containerId+' .emoji-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected'); myEmoji = emoji;
+  const other = containerId==='emojiGridLogin' ? 'emojiGridHome' : 'emojiGridLogin';
+  document.querySelectorAll('#'+other+' .emoji-opt').forEach(o => o.classList.toggle('selected', o.dataset.emoji===emoji));
+};
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+let toastTimer=null;
+function toast(msg, dur=2500) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ── Screen / tab helpers ──────────────────────────────────────────────────────
+function showScreen(id) {
+  ['screenHome','screenHostDash','screenRoomLogin','mainApp'].forEach(sid => {
+    const el=document.getElementById(sid); if(el) el.style.display='none';
+  });
+  const t=document.getElementById(id);
+  if(t) t.style.display = id==='mainApp' ? 'block' : 'flex';
+}
+window.showScreen = showScreen;
+
+function showTab(t) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const pg=document.getElementById('page'+t[0].toUpperCase()+t.slice(1));
+  const tb=document.getElementById('tab'+t[0].toUpperCase()+t.slice(1));
+  if(pg) pg.classList.add('active'); if(tb) tb.classList.add('active');
+  if(t==='analytics') renderAnalytics();
+}
+window.showTab = showTab;
+
+// ── Role toggles ──────────────────────────────────────────────────────────────
+window.setRole = r => {
+  myRole=r;
+  document.getElementById('roleStudent').classList.toggle('active', r==='student');
+  document.getElementById('roleHost').classList.toggle('active', r==='host');
+  document.getElementById('studentNoRoom').style.display = r==='student'?'block':'none';
+  document.getElementById('hostNoRoom').style.display   = r==='host'?'block':'none';
+};
+window.setRoleRoom = r => {
+  myRole=r;
+  document.getElementById('roleStudentRoom').classList.toggle('active', r==='student');
+  document.getElementById('roleHostRoom').classList.toggle('active', r==='host');
+  document.getElementById('hostPwField').style.display = r==='host'?'block':'none';
+  document.getElementById('hostIdField').style.display = r==='host'?'block':'none';
+  document.getElementById('studentClassIdSection').style.display = r==='student'?'block':'none';
+  document.getElementById('emojiPickerSection').style.display = r==='student'?'block':'none';
+  document.getElementById('studentPwSection').style.display = 'none';
+  if(r==='student') populateClassDropdowns();
+};
+
+// ── Class / ID dropdown helpers ───────────────────────────────────────────────
+function populateClassDropdowns() {
+  ['loginClassSelect','studentClassHome'].forEach(selId => {
+    const sel=document.getElementById(selId); if(!sel) return;
+    const cur=sel.value;
+    sel.innerHTML='<option value="">— Select your class —</option>';
+    Object.entries(DEFAULT_CLASSES).forEach(([name])=>{
+      const opt=document.createElement('option');
+      opt.value=name; opt.textContent=name;
+      if(name===cur) opt.selected=true;
+      sel.appendChild(opt);
+    });
+    // Also populate from Firebase classes if seeded
+    if(Object.keys(cachedClasses).length) {
+      sel.innerHTML='<option value="">— Select your class —</option>';
+      Object.values(cachedClasses).forEach(cls=>{
+        const opt=document.createElement('option');
+        opt.value=cls.name; opt.textContent=cls.name;
+        if(cls.name===cur) opt.selected=true;
+        sel.appendChild(opt);
+      });
+    }
+  });
+}
+window.populateStudentIdDropdown = (classSelId, idSelId) => {
+  const classSel=document.getElementById(classSelId);
+  const idSel=document.getElementById(idSelId);
+  if(!classSel||!idSel) return;
+  const className=classSel.value;
+  idSel.innerHTML='<option value="">— Select your ID —</option>';
+  if(!className) return;
+  // Look in cachedClasses first, fall back to DEFAULT_CLASSES
+  let students=null;
+  if(Object.keys(cachedClasses).length) {
+    const found=Object.values(cachedClasses).find(c=>c.name===className);
+    if(found) students=found.students;
+  }
+  if(!students) students=DEFAULT_CLASSES[className]||[];
+  students.forEach(sid=>{
+    const opt=document.createElement('option');
+    opt.value=sid; opt.textContent=sid;
+    idSel.appendChild(opt);
+  });
+};
+
+// ── Student password check (dropdown-driven) ──────────────────────────────────
+function setupPasswordCheck() {
+  // Legacy — no text input to attach to; pw check is triggered by dropdown onchange
+}
+async function checkStudentPwFromDropdown() {
+  if(myRole!=='student') return;
+  const id=(document.getElementById('loginIdSelect')||{}).value||'';
+  if(!id) { document.getElementById('studentPwSection').style.display='none'; return; }
+  const snap=await get(studentPwRef(id));
+  const existingPw=snap.val();
+  const pwSection=document.getElementById('studentPwSection');
+  const pwNotice=document.getElementById('studentPwNotice');
+  const pwLabel=document.getElementById('studentPwLabel');
+  pwSection.style.display='block';
+  if(existingPw) {
+    pwLabel.textContent='Password';
+    pwNotice.style.display='none';
+  } else {
+    pwLabel.textContent='Create a password (first time)';
+    pwNotice.style.display='block';
+    pwNotice.textContent='🔑 First time logging in. Create a password — you will use it every race.';
+  }
+}
+async function checkStudentPw() { await checkStudentPwFromDropdown(); }
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  applyTheme(getTheme());
+  buildEmojiGrid('emojiGridHome');
+  buildEmojiGrid('emojiGridLogin');
+  const room = getRoomFromUrl();
+  if(room) { currentRoom=room; document.getElementById('loginRoomBadge').textContent='Room: '+room; showScreen('screenRoomLogin'); populateClassDropdowns(); }
+  else showScreen('screenHome');
+  setupPasswordCheck();
+  populateClassDropdowns();
+  const sentTa=document.getElementById('sentenceSelect'); if(sentTa) sentTa.addEventListener('input', updateWordCount);
+  document.getElementById('typingInput').addEventListener('input', onTyping);
+  document.getElementById('newRoomInput').addEventListener('keydown', e=>{ if(e.key==='Enter') createRoom(); });
+  document.getElementById('newRoomFromHost').addEventListener('keydown', e=>{ if(e.key==='Enter') createRoomFromHost(); });
+  document.getElementById('studentRoomInput').addEventListener('keydown', e=>{ if(e.key==='Enter') joinRoomDirect(); });
+  document.getElementById('studentPwInput').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+});
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+window.joinRoomDirect = () => {
+  const room=slugify(document.getElementById('studentRoomInput').value);
+  const id=(document.getElementById('studentIdHome')||{}).value||'';
+  if(!room){toast('Enter a room name');return;}
+  if(!id){toast('Please select your Student ID');return;}
+  currentRoom=room; myId=id; myRole='student';
+  document.getElementById('loginRoomBadge').textContent='Room: '+room;
+  showScreen('screenRoomLogin');
+  // Pre-select class+ID in room login dropdowns
+  populateClassDropdowns();
+  const classSel=document.getElementById('studentClassHome');
+  const loginClass=document.getElementById('loginClassSelect');
+  if(loginClass && classSel) { loginClass.value=classSel.value; populateStudentIdDropdown('loginClassSelect','loginIdSelect'); }
+  const loginId=document.getElementById('loginIdSelect');
+  if(loginId) { loginId.value=id; checkStudentPwFromDropdown(); }
+};
+
+window.goToHostDashboard = async () => {
+  const pw=document.getElementById('hostPwHome').value;
+  if(!pw){toast('Enter a password');return;}
+  hostPassword=pw; showScreen('screenHostDash');
+  loadRoomsForDashboard();
+};
+
+window.doLogin = async () => {
+  let id='';
+  if(myRole==='student') {
+    id=(document.getElementById('loginIdSelect')||{}).value||'';
+    if(!id){toast('Please select your Student ID');return;}
+  } else {
+    id=(document.getElementById('userIdInput')||{}).value.trim()||'Host';
+  }
+  myId=id;
+  if(myRole==='student') {
+    const pw=document.getElementById('studentPwInput').value;
+    if(!pw){toast('Please enter a password');return;}
+    // Check / set password
+    const snap=await get(studentPwRef(id));
+    const existingPw=snap.val();
+    if(existingPw) {
+      if(existingPw !== pw){ toast('Incorrect password. Try again.'); return; }
+    } else {
+      // First time — set their password
+      await set(studentPwRef(id), pw);
+      toast('Password set! Remember it for next time.');
+    }
+  }
+  if(myRole==='host') {
+    const pw=document.getElementById('hostPwInput').value;
+    if(!pw){toast('Enter a host password');return;}
+    const snap=await get(stateRef(currentRoom));
+    const existing=snap.val();
+    if(existing && existing.hostPw && existing.hostPw!==pw){toast('Wrong host password');return;}
+    hostPassword=pw;
+    if(!existing) {
+      await set(stateRef(currentRoom), { hostPw:pw, status:'waiting', text:'', raceNum:0 });
+      await set(ref(db,'rooms/'+currentRoom+'/sentences'), ['The quick brown fox jumps over the lazy dog.']);
+    } else if(!existing.hostPw) {
+      await update(stateRef(currentRoom), {hostPw:pw});
+    }
+    const ri=await get(roomsIndexRef()); const idx=ri.val()||[];
+    if(!idx.includes(currentRoom)){idx.push(currentRoom); await set(roomsIndexRef(),idx);}
+    // Seed default classes if none exist
+    await seedDefaultClasses();
+  }
+  launchApp();
+};
+
+async function seedDefaultClasses() {
+  const snap=await get(classesRef());
+  if(snap.val()) return; // already seeded
+  const payload={};
+  for(const [className, students] of Object.entries(DEFAULT_CLASSES)) {
+    payload[safeid(className)] = { name: className, students: students };
+  }
+  await set(classesRef(), payload);
+  toast('Class rosters loaded ✓');
+}
+
+async function launchApp() {
+  showScreen('mainApp');
+  document.getElementById('headerUser').textContent=myId;
+  document.getElementById('headerEmoji').textContent=myEmoji;
+  document.getElementById('headerRoom').textContent='— '+currentRoom;
+  document.title='TypeRace — '+currentRoom;
+  document.getElementById('shareUrl').textContent=getRoomUrl(currentRoom);
+  if(myRole==='host'){
+    document.getElementById('tabHostBtn').style.display='';
+    document.getElementById('tabAnalyticsBtn').style.display='';
+    showTab('host');
+  }
+  if(myRole==='student') {
+    await set(joinedUserRef(currentRoom,myId), {ts:Date.now(), emoji:myEmoji, id:myId});
+  }
+  subscribeToRoom();
+}
+
+window.doLogout = () => {
+  unsubAll();
+  myId=''; myRole='student'; hostPassword='';
+  raceStarted=false; myFinished=false; currentRoom='';
+  cachedState=null; cachedRacers={}; cachedJoined={}; cachedResults=[];
+  cachedClasses={};
+  document.getElementById('tabHostBtn').style.display='none';
+  document.getElementById('tabAnalyticsBtn').style.display='none';
+  const room=getRoomFromUrl();
+  if(room){currentRoom=room; showScreen('screenRoomLogin');} else showScreen('screenHome');
+};
+
+function unsubAll() {
+  [unsubscribeState,unsubscribeRacers,unsubscribeJoined,unsubscribeResults,unsubscribeRooms,unsubscribeSentences,unsubscribeClasses]
+    .forEach(u=>{ if(u) u(); });
+  unsubscribeState=unsubscribeRacers=unsubscribeJoined=unsubscribeResults=unsubscribeRooms=unsubscribeSentences=unsubscribeClasses=null;
+}
+
+// ── Firebase subscriptions ────────────────────────────────────────────────────
+function subscribeToRoom() {
+  unsubAll();
+
+  unsubscribeState = onValue(stateRef(currentRoom), snap => {
+    const state = snap.val() || {};
+    cachedState = state;
+    if(state.status==='countdown' && state.startAt) {
+      const msLeft = state.startAt - Date.now();
+      const cd=document.getElementById('countdown');
+      cd.style.display='block';
+      const tickCountdown = () => {
+        const s = Math.ceil((state.startAt - Date.now()) / 1000);
+        if(cd) cd.textContent = s > 0 ? s : 'Go!';
+      };
+      tickCountdown();
+      clearInterval(window._cdInterval);
+      window._cdInterval = setInterval(tickCountdown, 300);
+      if(myRole==='host') {
+        clearTimeout(window._startTimeout);
+        window._startTimeout = setTimeout(async () => {
+          clearInterval(window._cdInterval);
+          if(cd) cd.style.display='none';
+          await update(stateRef(currentRoom), {status:'racing', startAt:null});
+        }, Math.max(msLeft, 0));
+      }
+    } else {
+      clearInterval(window._cdInterval);
+      document.getElementById('countdown').style.display='none';
+    }
+    updateRaceUI(state);
+    if(myRole==='host') updateHostUI(state);
+  });
+
+  unsubscribeRacers = onValue(racersRef(currentRoom), snap => {
+    cachedRacers = snap.val() || {};
+    renderRaceTrack();
+  });
+
+  unsubscribeJoined = onValue(joinedRef(currentRoom), snap => {
+    cachedJoined = snap.val() || {};
+    if(myRole==='host') renderJoined();
+    renderRaceTrack();
+  });
+
+  unsubscribeResults = onValue(resultsRef(currentRoom), snap => {
+    const raw=snap.val()||{};
+    cachedResults=Object.values(raw);
+    renderLeaderboard();
+  });
+
+  unsubscribeSentences = onValue(sentencesRef(currentRoom), snap => {
+    cachedSentences = snap.val() || [];
+    if(myRole==='host') renderSentences();
+  });
+
+  if(myRole==='host') {
+    unsubscribeRooms = onValue(roomsIndexRef(), snap => {
+      const rooms=snap.val()||[];
+      renderAllRooms(rooms);
+    });
+    unsubscribeClasses = onValue(classesRef(), snap => {
+      cachedClasses = snap.val() || {};
+      renderRosterTabs();
+      renderAnalyticsTabs();
+      populateClassDropdowns(); // refresh student login dropdowns
+    });
+  }
+}
+
+// ── Race UI ───────────────────────────────────────────────────────────────────
+function updateRaceUI(state) {
+  const badge=document.getElementById('statusBadge');
+  const title=document.getElementById('raceTitle');
+  const input=document.getElementById('typingInput');
+  if(state.status==='waiting'||!state.status) {
+    badge.className='status-badge badge-waiting'; badge.textContent='Waiting';
+    title.textContent='Waiting for host to start a race…';
+    if(raceStarted||typingStartTime){raceStarted=false;myFinished=false;resetTypingUI();}
+    input.disabled=true;
+    document.getElementById('raceTextDisplay').innerHTML='<span style="color:var(--text4);">The race text will appear here once the host starts.</span>';
+    document.getElementById('myProgress').style.width='0%';
+    document.getElementById('raceTrackCard').style.display='none';
+  } else if(state.status==='countdown') {
+    badge.className='status-badge badge-waiting'; badge.textContent='Get ready!';
+    title.textContent='Race starting soon…';
+    currentText=state.text||'';
+    if(raceNum!==state.raceNum){raceNum=state.raceNum;myFinished=false;resetTypingUI();renderTextDisplay('',currentText);}
+    input.disabled=true;
+    document.getElementById('raceTrackCard').style.display='block';
+  } else if(state.status==='racing') {
+    badge.className='status-badge badge-racing'; badge.textContent='Racing!';
+    title.textContent='Race #'+state.raceNum;
+    document.getElementById('raceTrackCard').style.display='block';
+    if(!raceStarted||raceNum!==state.raceNum) {
+      raceNum=state.raceNum; raceStarted=true; myFinished=false;
+      currentText=state.text||''; renderTextDisplay('',currentText);
+      resetTypingUI(); input.disabled=false; input.value='';
+      input.focus(); typingStartTime=Date.now(); startTypingTimer();
+      startRaceTimer(state.timerEndAt||null);
+    } else if(raceTimerInterval===null && state.timerEndAt) {
+      startRaceTimer(state.timerEndAt);
+    }
+  } else if(state.status==='done') {
+    badge.className='status-badge badge-done'; badge.textContent='Finished';
+    title.textContent='Race #'+state.raceNum+' complete!';
+    document.getElementById('raceTrackCard').style.display='block';
+    if(!myFinished) input.disabled=true;
+    clearInterval(typingTimer);
+  }
+}
+
+function resetTypingUI() {
+  clearInterval(typingTimer); typingTimer=null; typingStartTime=null;
+  clearInterval(raceTimerInterval); raceTimerInterval=null;
+  totalKeystrokes=0; correctKeystrokes=0;
+  document.getElementById('typingInput').value='';
+  document.getElementById('statWpm').textContent='0';
+  document.getElementById('statAcc').textContent='100%';
+  document.getElementById('statPos').textContent='—';
+  const stl=document.getElementById('statTimeLeft'); if(stl){stl.textContent='—';stl.classList.remove('timer-urgent');}
+  const htd=document.getElementById('hostTimerDisplay'); if(htd) htd.style.display='none';
+  const htv=document.getElementById('hostTimerVal'); if(htv){htv.textContent='—';htv.classList.remove('timer-urgent');}
+  const hrt=document.getElementById('raceHeaderTimer'); if(hrt){hrt.style.display='none';hrt.classList.remove('timer-urgent');}
+  document.getElementById('myProgress').style.width='0%';
+}
+
+function startTypingTimer() {
+  clearInterval(typingTimer);
+  typingTimer=setInterval(()=>{ /* keep alive */ },1000);
+}
+
+function startRaceTimer(timerEndAt) {
+  clearInterval(raceTimerInterval); raceTimerInterval=null;
+  const studentEl=document.getElementById('statTimeLeft');
+  const hostEl=document.getElementById('hostTimerVal');
+  const hostDisplay=document.getElementById('hostTimerDisplay');
+  const headerTimer=document.getElementById('raceHeaderTimer');
+  if(!timerEndAt) {
+    if(studentEl) studentEl.textContent='—';
+    if(hostDisplay) hostDisplay.style.display='none';
+    if(headerTimer) headerTimer.style.display='none';
+    return;
+  }
+  if(hostDisplay) hostDisplay.style.display='flex';
+  if(headerTimer) headerTimer.style.display='inline-flex';
+  function tick() {
+    const msLeft=timerEndAt-Date.now();
+    if(msLeft<=0) {
+      clearInterval(raceTimerInterval); raceTimerInterval=null;
+      if(studentEl){ studentEl.textContent='0:00'; studentEl.classList.add('timer-urgent'); }
+      if(hostEl){ hostEl.textContent='0:00'; hostEl.classList.add('timer-urgent'); }
+      if(headerTimer){ headerTimer.textContent='⏱ 0:00'; headerTimer.classList.add('timer-urgent'); }
+      if(myRole==='host') {
+        update(stateRef(currentRoom),{status:'done'}).then(()=>{
+          const btn=document.getElementById('startRaceBtn');
+          if(btn&&btn.className==='btn-started'){btn.textContent='▶ Start race';btn.className='btn-start';btn.onclick=window.startRace;}
+          toast('⏱ Time is up! Race ended.');
+        });
+      }
+      return;
+    }
+    const totalSecs=Math.ceil(msLeft/1000);
+    const m=Math.floor(totalSecs/60), s=totalSecs%60;
+    const label=m+':'+(s<10?'0':'')+s;
+    if(studentEl){studentEl.textContent=label;studentEl.classList.toggle('timer-urgent',totalSecs<=10);}
+    if(hostEl){hostEl.textContent=label;hostEl.classList.toggle('timer-urgent',totalSecs<=10);}
+    if(headerTimer){headerTimer.textContent='⏱ '+label;headerTimer.classList.toggle('timer-urgent',totalSecs<=10);}
+  }
+  tick();
+  raceTimerInterval=setInterval(tick,500);
+}
+
+// ── Typing ────────────────────────────────────────────────────────────────────
+function onTyping(e) {
+  if(!raceStarted||myFinished||!currentText) return;
+  const input=e.target; const typed=input.value;
+  let firstError=-1;
+  for(let i=0;i<typed.length;i++){if(typed[i]!==currentText[i]){firstError=i;break;}}
+  if(firstError!==-1) {
+    totalKeystrokes++;
+    input.value=typed.substring(0,firstError);
+    input.style.borderColor='var(--red)';
+    clearTimeout(input._errTimer);
+    input._errTimer=setTimeout(()=>{input.style.borderColor='';},300);
+    renderTextDisplay(input.value,currentText);
+    const pct=Math.min(100,Math.round((input.value.length/currentText.length)*100));
+    document.getElementById('myProgress').style.width=pct+'%';
+    const acc=totalKeystrokes>0?Math.round((correctKeystrokes/totalKeystrokes)*100):100;
+    document.getElementById('statAcc').textContent=acc+'%';
+    return;
+  }
+  if(typed.length>(input._prevLen||0)){totalKeystrokes++;correctKeystrokes++;}
+  input._prevLen=typed.length;
+  input.style.borderColor='';
+  renderTextDisplay(typed,currentText);
+  const pct=Math.min(100,Math.round((typed.length/currentText.length)*100));
+  document.getElementById('myProgress').style.width=pct+'%';
+  const elapsed=(Date.now()-typingStartTime)/1000;
+  const rawChars=totalKeystrokes;
+  const rawWords=rawChars/5;
+  const wpm=elapsed>0?Math.round((rawWords/elapsed)*60):0;
+  const acc=totalKeystrokes>0?Math.round((correctKeystrokes/totalKeystrokes)*100):100;
+  const score=Math.round(wpm*(acc/100));
+  document.getElementById('statWpm').textContent=wpm;
+  document.getElementById('statAcc').textContent=acc+'%';
+  const ef=elapsed.toFixed(2);
+  set(racerRef(currentRoom,myId),{progress:pct,wpm,acc,score,finished:false,time:ef,emoji:myEmoji,id:myId});
+  if(typed===currentText) {
+    myFinished=true; clearInterval(typingTimer);
+    set(racerRef(currentRoom,myId),{progress:100,wpm,acc,score,finished:true,time:ef,emoji:myEmoji,id:myId});
+    input.disabled=true;
+    toast('🎉 Finished! '+wpm+' WPM, '+acc+'% accuracy');
+    // Save to room results
+    push(resultsRef(currentRoom),{id:myId,emoji:myEmoji,wpm,acc,score,time:ef,raceNum,ts:new Date().toISOString()});
+    // Save to per-student history
+    push(studentResultsRef(myId),{room:currentRoom,wpm,acc,score,time:ef,raceNum,ts:new Date().toISOString()});
+  }
+}
+
+// ── Race track ────────────────────────────────────────────────────────────────
+function renderRaceTrack() {
+  const container=document.getElementById('trackLanes');
+  if(!container) return;
+  const allIds=new Set([...Object.keys(cachedJoined),...Object.keys(cachedRacers)]);
+  if(allIds.size===0){container.innerHTML='<div style="font-size:13px;color:var(--text4);padding:4px 0;">Waiting for racers…</div>';return;}
+  const entries=[...allIds].map(sid=>{
+    const j=cachedJoined[sid]||{}; const r=cachedRacers[sid]||{};
+    return {id:j.id||r.id||sid,emoji:j.emoji||r.emoji||'🐶',progress:r.progress||0,finished:r.finished||false,wpm:r.wpm||0};
+  }).sort((a,b)=>b.progress-a.progress);
+  container.innerHTML=entries.map(r=>{
+    const isMe=r.id===myId;
+    const lp=(2+(r.progress/100)*88).toFixed(1);
+    return `<div class="track-lane">
+      <div class="lane-label${isMe?' me-label':''}">
+        <span>${r.emoji}</span>
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.id)}${isMe?' (you)':''}</span>
+      </div>
+      <div class="track-bar">
+        <div class="track-runner${r.finished?' track-runner-done':''}" style="left:${lp}%;">
+          <span class="track-runner-emoji">${r.emoji}</span>
+        </div>
+        <div class="track-finish"></div>
+        <span class="track-pct">${r.wpm>0?r.wpm+' wpm':r.progress+'%'}</span>
+      </div>
+    </div>`;
+  }).join('');
+  const myPos=entries.findIndex(r=>r.id===myId);
+  if(myPos>=0) document.getElementById('statPos').textContent=(myPos+1)+' / '+entries.length;
+  document.getElementById('liveCount').textContent=entries.length+' racer'+(entries.length!==1?'s':'')+' in room';
+}
+
+function renderTextDisplay(typed,full) {
+  const tokens=full.split(/(\s+)/);
+  let html='',pos=0;
+  for(const token of tokens){
+    if(!token) continue;
+    const isSpace=/^\s+$/.test(token); let th='';
+    for(let j=0;j<token.length;j++){
+      const raw=token[j],ch=raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const i=pos+j;
+      if(i<typed.length){th+=typed[i]===raw?`<span class="char-correct">${ch}</span>`:`<span class="char-wrong">${ch}</span>`;}
+      else if(i===typed.length){th+=`<span class="char-current">${ch}</span>`;}
+      else{th+=`<span class="char-pending">${ch}</span>`;}
+    }
+    html+=isSpace?th:`<span style="display:inline-block">${th}</span>`;
+    pos+=token.length;
+  }
+  document.getElementById('raceTextDisplay').innerHTML=html;
+}
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+function renderLeaderboard() {
+  const container=document.getElementById('lbRows');
+  if(!cachedResults.length){container.innerHTML='<div class="empty-state">No results yet — complete a race first!</div>';return;}
+  const sorted=[...cachedResults].sort((a,b)=>{
+    const sa=(a.score!==undefined?a.score:Math.round(a.wpm*((a.acc||100)/100)));
+    const sb=(b.score!==undefined?b.score:Math.round(b.wpm*((b.acc||100)/100)));
+    return sb-sa;
+  });
+  container.innerHTML=sorted.map((r,i)=>{
+    const sc=(r.score!==undefined?r.score:Math.round(r.wpm*((r.acc||100)/100)));
+    return `
+    <div class="lb-row ${r.id===myId?'me':''}">
+      <span class="lb-rank ${i===0?'gold':i===1?'silver':i===2?'bronze':''}">${i+1}</span>
+      <span class="lb-name">${r.emoji||''} ${esc(r.id)}</span>
+      <span class="lb-wpm">${r.wpm}</span><span class="lb-acc">${r.acc}%</span>
+      <span style="width:60px;text-align:right;font-size:14px;font-weight:600;color:var(--blue);">${sc}</span>
+      <span class="lb-time">${r.time}s</span>
+      <span style="width:70px;text-align:right;font-size:13px;color:var(--text4);">Race #${r.raceNum||'—'}</span>
+      <button class="btn-del" onclick="window.deleteRecord('${esc(r.id)}',${r.wpm},'${r.time}','${r.ts||''}')">✕</button>
+    </div>`;}).join('');
+  if(myRole==='host') {
+    const hc=document.getElementById('hostResults');
+    hc.innerHTML=sorted.map((r,i)=>{
+      const sc=(r.score!==undefined?r.score:Math.round(r.wpm*((r.acc||100)/100)));
+      return `
+      <div class="lb-row">
+        <span class="lb-rank">${i+1}</span>
+        <span class="lb-name">${r.emoji||''} ${esc(r.id)}</span>
+        <span class="lb-wpm">${r.wpm} WPM</span><span class="lb-acc">${r.acc}%</span>
+        <span style="width:60px;text-align:right;font-size:13px;color:var(--blue);">${sc} pts</span>
+        <span class="lb-time">${r.time}s</span>
+        <button class="btn-del" onclick="window.deleteRecord('${esc(r.id)}',${r.wpm},'${r.time}','${r.ts||''}')">✕</button>
+      </div>`;}).join('');
+  }
+}
+
+window.deleteRecord = async (id, wpm, time, ts) => {
+  const snap=await get(resultsRef(currentRoom)); const raw=snap.val()||{};
+  for(const [key,r] of Object.entries(raw)) {
+    if(r.id===id && r.wpm===wpm && r.time===time && (r.ts===ts||!ts)) {
+      await remove(ref(db,'rooms/'+currentRoom+'/results/'+key)); toast('Record deleted'); break;
+    }
+  }
+};
+
+window.removeStudent = async (safeKey, displayName) => {
+  if(!confirm('Remove "'+displayName+'" from this room?')) return;
+  await remove(ref(db,'rooms/'+currentRoom+'/joined/'+safeKey));
+  await remove(ref(db,'rooms/'+currentRoom+'/racers/'+safeKey));
+  toast('"'+displayName+'" removed');
+};
+
+// ── Host UI ───────────────────────────────────────────────────────────────────
+function renderJoined() {
+  const ids=Object.keys(cachedJoined);
+  const jl=document.getElementById('joinedList'); const jc=document.getElementById('joinedCount');
+  if(!ids.length){jl.innerHTML='<span style="font-size:14px;color:var(--text4);">No students yet.</span>';jc.textContent='';return;}
+  jc.textContent='('+ids.length+')';
+  jl.innerHTML=ids.map(sid=>{
+    const j=cachedJoined[sid];
+    const displayName=j.id||sid;
+    const incomplete = !isValidStudentId(displayName);
+    return `<span style="display:inline-flex;align-items:center;gap:6px;background:${incomplete?'var(--red-bg)':'var(--bg3)'};border:1px solid ${incomplete?'#7f1d1d':'var(--border)'};border-radius:20px;padding:4px 8px 4px 12px;font-size:13px;">
+      ${j.emoji||''} ${esc(displayName)}${incomplete?' <span style="color:var(--red);font-size:11px;">(incomplete)</span>':''}
+      <button onclick="window.removeStudent('${esc(sid)}','${esc(displayName)}')" title="Remove" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1;padding:2px 4px;border-radius:50%;">✕</button>
+    </span>`;
+  }).join('');
+}
+
+function renderSentences() {
+  // Textarea-based: populate with current active text if blank
+  const activeText=(cachedState&&cachedState.text)||'';
+  const ta=document.getElementById('sentenceSelect'); if(!ta) return;
+  if(!ta.value && activeText) ta.value=activeText;
+  updateWordCount();
+}
+function updateWordCount() {
+  const ta=document.getElementById('sentenceSelect'); if(!ta) return;
+  const wc=ta.value.trim().split(/\s+/).filter(Boolean).length;
+  const el=document.getElementById('wordCountDisplay'); if(!el) return;
+  el.textContent=wc+' / 150 words';
+  el.style.color = wc>150 ? 'var(--red)' : wc>120 ? 'var(--accent)' : 'var(--text4)';
+}
+
+function updateHostUI(state) {
+  renderJoined();
+  renderSentences();
+}
+
+function renderAllRooms(rooms) {
+  const grid=document.getElementById('allRoomsGrid');
+  grid.innerHTML=rooms.length?rooms.map(r=>`
+    <div class="room-row">
+      <div style="flex:1;min-width:0;">
+        <div class="room-row-name">${esc(r)}${r===currentRoom?' <span style="font-size:11px;color:var(--accent);">(current)</span>':''}</div>
+        <div class="room-row-link">${esc(getRoomUrl(r))}</div>
+      </div>
+      <button class="copy-btn" style="padding:5px 12px;font-size:12px;" onclick="window.copyRoomLink('${esc(r)}')">Copy</button>
+    </div>`).join(''):'<div class="empty-state" style="padding:1rem;">No rooms.</div>';
+}
+
+// ── Roster management ─────────────────────────────────────────────────────────
+function renderRosterTabs() {
+  const tabs=document.getElementById('rosterClassTabs'); if(!tabs) return;
+  const classKeys=Object.keys(cachedClasses);
+  if(!classKeys.length){ tabs.innerHTML='<span style="font-size:13px;color:var(--text4);">No classes yet.</span>'; return; }
+  if(!activeRosterClass || !cachedClasses[activeRosterClass]) activeRosterClass=classKeys[0];
+  tabs.innerHTML=classKeys.map(k=>`<button class="class-tab${k===activeRosterClass?' active':''}" onclick="window.selectRosterClass('${esc(k)}')">${esc(cachedClasses[k].name||k)}</button>`).join('');
+  renderRosterContent();
+}
+
+window.selectRosterClass = k => {
+  activeRosterClass=k;
+  document.querySelectorAll('#rosterClassTabs .class-tab').forEach(b=>b.classList.toggle('active', b.textContent.trim()===(cachedClasses[k].name||k)));
+  renderRosterContent();
+};
+
+function renderRosterContent() {
+  const wrap=document.getElementById('rosterContent'); if(!wrap) return;
+  const cls=cachedClasses[activeRosterClass]; if(!cls){ wrap.innerHTML=''; return; }
+  const students=cls.students||[];
+  const addWrap=document.getElementById('addStudentToClassWrap');
+  const addLabel=document.getElementById('addStudentClassName');
+  if(addWrap) addWrap.style.display='block';
+  if(addLabel) addLabel.textContent=cls.name||activeRosterClass;
+
+  wrap.innerHTML=`
+    <div style="overflow-x:auto;">
+    <table class="student-table">
+      <thead><tr>
+        <th>#</th><th>Student ID</th><th>Has Password</th><th>Remove</th>
+      </tr></thead>
+      <tbody id="rosterTableBody"></tbody>
+    </table>
+    </div>`;
+
+  // Load password status for each student
+  const tbody=document.getElementById('rosterTableBody');
+  tbody.innerHTML=students.map((sid,i)=>`
+    <tr>
+      <td style="color:var(--text3);">${i+1}</td>
+      <td>${esc(sid)}</td>
+      <td id="pwStatus_${esc(safeid(sid))}" style="color:var(--text4);">…</td>
+      <td><button class="btn-del" onclick="window.removeStudentFromClass('${esc(activeRosterClass)}',${i},'${esc(sid)}')">✕</button></td>
+    </tr>`).join('');
+
+  // Async load pw status
+  students.forEach(async sid => {
+    const snap=await get(studentPwRef(sid));
+    const el=document.getElementById('pwStatus_'+esc(safeid(sid)));
+    if(el) el.innerHTML=snap.val() ? '<span style="color:var(--green);">✓ Set</span>' : '<span style="color:var(--text4);">Not set</span>';
+  });
+}
+
+window.removeStudentFromClass = async (classKey, index, sid) => {
+  if(!confirm('Remove "'+sid+'" from this class?')) return;
+  const cls=cachedClasses[classKey]; if(!cls) return;
+  const students=[...(cls.students||[])];
+  students.splice(index,1);
+  await update(ref(db,'classes/'+classKey), {students});
+  toast('"'+sid+'" removed from class');
+};
+
+window.addNewClass = async () => {
+  const nameInput=document.getElementById('newClassName');
+  const name=nameInput.value.trim(); if(!name){toast('Enter a class name');return;}
+  const key=safeid(name);
+  await set(ref(db,'classes/'+key), {name, students:[]});
+  nameInput.value=''; toast('Class "'+name+'" added ✓');
+};
+
+window.addStudentToClass = async () => {
+  const idInput=document.getElementById('newStudentId');
+  const sid=idInput.value.trim(); if(!sid){toast('Enter a student ID');return;}
+  const cls=cachedClasses[activeRosterClass]; if(!cls){toast('Select a class first');return;}
+  const students=[...(cls.students||[])];
+  if(students.includes(sid)){toast('Student already in class');return;}
+  students.push(sid);
+  await update(ref(db,'classes/'+activeRosterClass),{students});
+  idInput.value=''; toast('Student added ✓');
+};
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+function renderAnalyticsTabs() {
+  const tabs=document.getElementById('analyticsClassTabs'); if(!tabs) return;
+  const classKeys=Object.keys(cachedClasses);
+  if(!classKeys.length){ tabs.innerHTML=''; return; }
+  if(!activeAnalyticsClass || !cachedClasses[activeAnalyticsClass]) activeAnalyticsClass=classKeys[0];
+  tabs.innerHTML=classKeys.map(k=>`<button class="class-tab${k===activeAnalyticsClass?' active':''}" onclick="window.selectAnalyticsClass('${esc(k)}')">${esc(cachedClasses[k].name||k)}</button>`).join('');
+}
+
+window.selectAnalyticsClass = k => {
+  activeAnalyticsClass=k;
+  document.querySelectorAll('#analyticsClassTabs .class-tab').forEach(b=>b.classList.toggle('active', b.textContent.trim()===(cachedClasses[k].name||k)));
+  renderAnalytics();
+};
+
+async function renderAnalytics() {
+  if(myRole!=='host') return;
+  const classKeys=Object.keys(cachedClasses);
+  if(!classKeys.length){
+    document.getElementById('analyticsClassContent').innerHTML='<div class="empty-state">No classes loaded yet.</div>';
+    return;
+  }
+  renderAnalyticsTabs();
+  // Build class-comparison bar chart (avg WPM per class)
+  await buildClassCompareChart(classKeys);
+  if(!activeAnalyticsClass) { activeAnalyticsClass=classKeys[0]; }
+  await renderClassDetail(activeAnalyticsClass);
+}
+
+async function buildClassCompareChart(classKeys) {
+  const chart=document.getElementById('classCompareChart'); if(!chart) return;
+  const avgs=[];
+  for(const k of classKeys) {
+    const cls=cachedClasses[k]; if(!cls) continue;
+    const students=cls.students||[];
+    let total=0, count=0;
+    for(const sid of students) {
+      const snap=await get(studentResultsRef(sid));
+      const results=snap.val()||{};
+      const vals=Object.values(results).map(r=>r.wpm||0).filter(w=>w>0);
+      if(vals.length){ total+=vals.reduce((a,b)=>a+b,0)/vals.length; count++; }
+    }
+    avgs.push({label:cls.name||k, avg:count>0?Math.round(total/count):0});
+  }
+  const maxAvg=Math.max(...avgs.map(a=>a.avg), 1);
+  chart.innerHTML=avgs.map(a=>{
+    const h=Math.round((a.avg/maxAvg)*100);
+    return `<div class="bar-col">
+      <div class="bar-val">${a.avg||'—'}</div>
+      <div class="bar-fill" style="height:${h}%;background:var(--accent);"></div>
+      <div class="bar-label">${esc(a.label)}</div>
+    </div>`;
+  }).join('');
+}
+
+async function renderClassDetail(classKey) {
+  const container=document.getElementById('analyticsClassContent'); if(!container) return;
+  const cls=cachedClasses[classKey]; if(!cls){ container.innerHTML=''; return; }
+  const students=cls.students||[];
+  container.innerHTML='<div class="empty-state">Loading analytics…</div>';
+
+  // Gather all student results
+  const studentData=[];
+  for(const sid of students) {
+    const snap=await get(studentResultsRef(sid));
+    const results=Object.values(snap.val()||{});
+    const wpms=results.map(r=>r.wpm||0).filter(w=>w>0);
+    const accs=results.map(r=>r.acc||0).filter(a=>a>0);
+    studentData.push({
+      id: sid,
+      results: results.sort((a,b)=>(a.ts||'').localeCompare(b.ts||'')),
+      avgWpm: wpms.length ? Math.round(wpms.reduce((a,b)=>a+b,0)/wpms.length) : 0,
+      avgAcc: accs.length ? Math.round(accs.reduce((a,b)=>a+b,0)/accs.length) : 0,
+      bestWpm: wpms.length ? Math.max(...wpms) : 0,
+      raceCount: results.length
+    });
+  }
+
+  // Descriptive statistics for WPM
+  const allWpms=studentData.map(s=>s.avgWpm).filter(w=>w>0);
+  const stats=calcStats(allWpms);
+
+  // Build growth SVGs for top 5 most active students
+  const active=studentData.filter(s=>s.raceCount>1).sort((a,b)=>b.raceCount-a.raceCount).slice(0,5);
+
+  container.innerHTML=`
+    <div class="analytics-grid">
+      <div class="stat-block">
+        <h4>Class statistics — WPM</h4>
+        <table class="desc-table">
+          <tr><td>Students with data</td><td>${allWpms.length} / ${students.length}</td></tr>
+          <tr><td>Mean</td><td>${stats.mean}</td></tr>
+          <tr><td>Median</td><td>${stats.median}</td></tr>
+          <tr><td>Std dev</td><td>${stats.sd}</td></tr>
+          <tr><td>Min</td><td>${stats.min}</td></tr>
+          <tr><td>Max</td><td>${stats.max}</td></tr>
+        </table>
+      </div>
+      <div class="stat-block">
+        <h4>WPM distribution</h4>
+        <div class="bar-chart" id="wpmDistChart" style="height:100px;"></div>
+      </div>
+    </div>
+    <div class="chart-wrap" id="growthCharts">
+      <h4>Top student progress (WPM over races)</h4>
+      ${active.length ? active.map(s=>renderGrowthChart(s)).join('') : '<div class="empty-state" style="padding:1rem;">Need 2+ races per student to show growth.</div>'}
+    </div>
+    <div class="chart-wrap">
+      <h4>All students — ${esc(cls.name||classKey)}</h4>
+      <div style="overflow-x:auto;">
+      <table class="student-table">
+        <thead><tr>
+          <th>#</th><th>Student ID</th><th>Races</th><th>Avg WPM</th><th>Best WPM</th><th>Avg Acc</th>
+        </tr></thead>
+        <tbody>
+          ${studentData.sort((a,b)=>b.avgWpm-a.avgWpm).map((s,i)=>`
+          <tr>
+            <td style="color:var(--text3);">${i+1}</td>
+            <td>${esc(s.id)}</td>
+            <td style="color:var(--text3);">${s.raceCount}</td>
+            <td style="color:var(--accent);font-weight:600;">${s.avgWpm||'—'}</td>
+            <td style="color:var(--green);">${s.bestWpm||'—'}</td>
+            <td style="color:var(--blue);">${s.avgAcc||'—'}${s.avgAcc?'%':''}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      </div>
+    </div>`;
+
+  // WPM distribution bar chart
+  buildWpmDist(studentData);
+}
+
+function calcStats(values) {
+  if(!values.length) return {mean:'—',median:'—',sd:'—',min:'—',max:'—'};
+  const sorted=[...values].sort((a,b)=>a-b);
+  const n=sorted.length;
+  const mean=Math.round(sorted.reduce((a,b)=>a+b,0)/n);
+  const median=n%2===0?Math.round((sorted[n/2-1]+sorted[n/2])/2):sorted[Math.floor(n/2)];
+  const variance=sorted.reduce((acc,v)=>acc+Math.pow(v-mean,2),0)/n;
+  const sd=Math.round(Math.sqrt(variance));
+  return {mean,median,sd,min:sorted[0],max:sorted[n-1]};
+}
+
+function buildWpmDist(studentData) {
+  const chart=document.getElementById('wpmDistChart'); if(!chart) return;
+  // Bucket into ranges
+  const buckets=[
+    {label:'0–19',min:0,max:19},{label:'20–39',min:20,max:39},{label:'40–59',min:40,max:59},
+    {label:'60–79',min:60,max:79},{label:'80–99',min:80,max:99},{label:'100+',min:100,max:9999}
+  ];
+  const counts=buckets.map(b=>({...b,count:studentData.filter(s=>s.avgWpm>=b.min&&s.avgWpm<=b.max).length}));
+  const maxCount=Math.max(...counts.map(c=>c.count),1);
+  chart.innerHTML=counts.map(c=>{
+    const h=Math.round((c.count/maxCount)*100);
+    return `<div class="bar-col">
+      <div class="bar-val">${c.count}</div>
+      <div class="bar-fill" style="height:${h}%;background:var(--blue);"></div>
+      <div class="bar-label">${c.label}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderGrowthChart(student) {
+  const races=student.results.filter(r=>r.wpm>0).slice(-10);
+  if(races.length<2) return '';
+  const wpms=races.map(r=>r.wpm);
+  const maxW=Math.max(...wpms,1);
+  const minW=Math.min(...wpms,0);
+  const range=maxW-minW||1;
+  const w=200, h=80, pad=10;
+  const pts=wpms.map((w2,i)=>{
+    const x=pad+(i/(wpms.length-1))*(w-pad*2);
+    const y=h-pad-((w2-minW)/range)*(h-pad*2);
+    return {x,y,w:w2};
+  });
+  const polyline=pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+  const areaPath=`M${pts[0].x.toFixed(1)},${h-pad} ` + pts.map(p=>`L${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') + ` L${pts[pts.length-1].x.toFixed(1)},${h-pad} Z`;
+  return `<div style="margin-bottom:12px;">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:4px;">${esc(student.id)} — avg ${student.avgWpm} WPM, ${student.raceCount} races</div>
+    <svg viewBox="0 0 ${w} ${h}" class="growth-svg">
+      <path d="${areaPath}" class="trend-area"/>
+      <polyline points="${polyline}" class="trend-line"/>
+      ${pts.map((p,i)=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3" class="trend-dot"/>`).join('')}
+    </svg>
+  </div>`;
+}
+
+// ── Host dashboard rooms ──────────────────────────────────────────────────────
+async function loadRoomsForDashboard() {
+  onValue(roomsIndexRef(), snap => {
+    const rooms=snap.val()||[];
+    const grid=document.getElementById('roomsGrid');
+    grid.innerHTML=rooms.length?rooms.map(r=>`
+      <div class="room-row">
+        <div style="flex:1;min-width:0;"><div class="room-row-name">${esc(r)}</div><div class="room-row-link">${esc(getRoomUrl(r))}</div></div>
+        <button class="copy-btn" style="padding:6px 14px;font-size:12px;" onclick="window.copyRoomLink('${esc(r)}')">Copy</button>
+        <button class="btn-sm" onclick="window.enterRoom('${esc(r)}')">Enter</button>
+      </div>`).join(''):'<div class="empty-state" style="padding:1rem;">No rooms yet.</div>';
+  });
+}
+
+window.createRoom = async () => {
+  const name=slugify(document.getElementById('newRoomInput').value);
+  if(!name){toast('Enter a valid room name');return;}
+  const ri=await get(roomsIndexRef()); const idx=ri.val()||[];
+  if(!idx.includes(name)){idx.push(name); await set(roomsIndexRef(),idx);}
+  const existing=await get(stateRef(name));
+  if(!existing.val()) {
+    await set(stateRef(name),{hostPw:hostPassword,status:'waiting',text:'',raceNum:0});
+    await set(ref(db,'rooms/'+name+'/sentences'),['The quick brown fox jumps over the lazy dog.']);
+  }
+  document.getElementById('newRoomInput').value=''; toast('Room "'+name+'" created ✓');
+};
+
+window.enterRoom = r => { currentRoom=r; myRole='host'; myId='Host'; launchApp(); };
+
+window.createRoomFromHost = async () => {
+  const name=slugify(document.getElementById('newRoomFromHost').value);
+  if(!name){toast('Enter a valid room name');return;}
+  const ri=await get(roomsIndexRef()); const idx=ri.val()||[];
+  if(!idx.includes(name)){idx.push(name); await set(roomsIndexRef(),idx);}
+  const existing=await get(stateRef(name));
+  if(!existing.val()){
+    await set(stateRef(name),{hostPw:hostPassword,status:'waiting',text:'',raceNum:0});
+    await set(ref(db,'rooms/'+name+'/sentences'),['The quick brown fox jumps over the lazy dog.']);
+  }
+  document.getElementById('newRoomFromHost').value=''; toast('Room "'+name+'" created ✓');
+};
+
+// ── Sentences ─────────────────────────────────────────────────────────────────
+window.addSentence = async () => {
+  const inp=document.getElementById('newSentenceInput'); const s=inp.value.trim();
+  if(!s){toast('Enter a sentence first');return;}
+  const snap=await get(ref(db,'rooms/'+currentRoom+'/sentences'));
+  const arr=snap.val()||[]; arr.push(s);
+  await set(ref(db,'rooms/'+currentRoom+'/sentences'),arr);
+  inp.value=''; toast('Sentence added ✓');
+};
+window.removeSentence = async i => {
+  const snap=await get(ref(db,'rooms/'+currentRoom+'/sentences'));
+  const arr=snap.val()||[]; arr.splice(i,1);
+  await set(ref(db,'rooms/'+currentRoom+'/sentences'),arr);
+};
+
+// ── Race controls ─────────────────────────────────────────────────────────────
+window.startRace = async () => {
+  const ta=document.getElementById('sentenceSelect');
+  const chosen=(ta&&ta.value.trim())||'';
+  if(!chosen){toast('Type a sentence first!');return;}
+  const wordCount=chosen.trim().split(/\s+/).filter(Boolean).length;
+  if(wordCount>150){toast('Too long — please keep it under 150 words (currently '+wordCount+')');return;}
+  const rn=(cachedState&&cachedState.raceNum||0)+1;
+  const mins=parseInt(document.getElementById('timerMinutes').value)||0;
+  const secs=parseInt(document.getElementById('timerSeconds').value)||0;
+  const timerDuration=(mins*60+secs)*1000;
+  const raceStartsAt=Date.now()+3000;
+  const timerEndAt=timerDuration>0 ? raceStartsAt+timerDuration : null;
+  await set(racersRef(currentRoom),null);
+  await update(stateRef(currentRoom),{status:'countdown',text:chosen,raceNum:rn,startAt:raceStartsAt,timerEndAt:timerEndAt||null});
+  const btn=document.getElementById('startRaceBtn');
+  btn.textContent='Started ✓'; btn.className='btn-started'; btn.onclick=null;
+  toast('Race starting in 3…');
+};
+
+window.resetRace = async () => {
+  await update(stateRef(currentRoom),{status:'waiting',startAt:null,timerEndAt:null});
+  await set(racersRef(currentRoom),null);
+  raceStarted=false; myFinished=false;
+  clearInterval(raceTimerInterval); raceTimerInterval=null;
+  const htd=document.getElementById('hostTimerDisplay'); if(htd) htd.style.display='none';
+  const btn=document.getElementById('startRaceBtn');
+  btn.textContent='▶ Start race'; btn.className='btn-start'; btn.onclick=window.startRace;
+  toast('Race reset');
+};
+
+window.clearResults = async () => {
+  if(!confirm('Clear all results for room "'+currentRoom+'"?')) return;
+  await set(resultsRef(currentRoom),null); toast('Results cleared');
+};
+
+// ── Share / export ────────────────────────────────────────────────────────────
+window.copyLink = () => window.copyRoomLink(currentRoom);
+window.copyRoomLink = room => {
+  const url=getRoomUrl(room);
+  if(navigator.clipboard) navigator.clipboard.writeText(url).then(()=>toast('Link copied! 📋')).catch(()=>fallbackCopy(url));
+  else fallbackCopy(url);
+};
+function fallbackCopy(text) {
+  const ta=document.createElement('textarea'); ta.value=text;
+  document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+  document.body.removeChild(ta); toast('Link copied! 📋');
+}
+window.exportCSV = () => {
+  if(!cachedResults.length){toast('No results to export yet');return;}
+  const header=['Rank','Student ID','Emoji','WPM','Accuracy (%)','Score','Time (s)','Race #','Timestamp'];
+  const sorted=[...cachedResults].sort((a,b)=>{
+    const sa=(a.score!==undefined?a.score:Math.round(a.wpm*((a.acc||100)/100)));
+    const sb=(b.score!==undefined?b.score:Math.round(b.wpm*((b.acc||100)/100)));
+    return sb-sa;
+  });
+  const rows=sorted.map((r,i)=>{
+    const sc=(r.score!==undefined?r.score:Math.round(r.wpm*((r.acc||100)/100)));
+    return [i+1,'"'+r.id+'"',r.emoji||'',r.wpm,r.acc,sc,r.time,r.raceNum||'',r.ts||''].join(',');
+  });
+  const csv=[header.join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download='typerace_'+currentRoom+'.csv'; a.click();
+  URL.revokeObjectURL(url); toast('CSV downloaded! 📊');
+};
+
+window.exportAnalyticsCSV = async () => {
+  if(!activeAnalyticsClass){ toast('Select a class first'); return; }
+  const cls=cachedClasses[activeAnalyticsClass]; if(!cls){ return; }
+  const students=cls.students||[];
+  const rows=[['Student ID','Races','Avg WPM','Best WPM','Avg Accuracy (%)'].join(',')];
+  for(const sid of students) {
+    const snap=await get(studentResultsRef(sid));
+    const results=Object.values(snap.val()||{});
+    const wpms=results.map(r=>r.wpm||0).filter(w=>w>0);
+    const accs=results.map(r=>r.acc||0).filter(a=>a>0);
+    const avgWpm=wpms.length?Math.round(wpms.reduce((a,b)=>a+b,0)/wpms.length):0;
+    const bestWpm=wpms.length?Math.max(...wpms):0;
+    const avgAcc=accs.length?Math.round(accs.reduce((a,b)=>a+b,0)/accs.length):0;
+    rows.push(['"'+sid+'"',results.length,avgWpm,bestWpm,avgAcc].join(','));
+  }
+  const csv=rows.join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});
+  const url=URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download='analytics_'+(cls.name||activeAnalyticsClass)+'.csv'; a.click();
+  URL.revokeObjectURL(url); toast('Analytics CSV downloaded!');
+};
+</script>
+</body>
+</html>
