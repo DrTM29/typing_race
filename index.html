@@ -285,8 +285,8 @@ select.field-select:focus{border-color:var(--accent);}
       <label class="field-label" id="loginIdLabel">Host / Teacher ID</label>
       <input class="field-input" id="userIdInput" type="text" placeholder="e.g. Teacher" maxlength="40" autocomplete="off"/>
     </div>
-    <!-- Student password section (shown after ID entered) -->
-    <div id="studentPwSection" style="display:none;">
+    <!-- Student password section -->
+    <div id="studentPwSection">
       <div id="studentPwNotice" class="pw-notice" style="display:none;"></div>
       <div class="field-group">
         <label class="field-label" id="studentPwLabel">Password</label>
@@ -684,21 +684,17 @@ function setupPasswordCheck() {
 async function checkStudentPwFromDropdown() {
   if(myRole!=='student') return;
   const id=(document.getElementById('loginIdSelect')||{}).value||'';
-  const pwSection=document.getElementById('studentPwSection');
   const pwNotice=document.getElementById('studentPwNotice');
   const pwLabel=document.getElementById('studentPwLabel');
-  if(!id) { pwSection.style.display='none'; return; }
-  // Show immediately so the student can start typing their password
-  pwSection.style.display='block';
-  pwLabel.textContent='Password';
-  pwNotice.style.display='none';
-  // Then refine label once Firebase confirms if it's their first time
+  if(!id) { if(pwLabel) pwLabel.textContent='Password'; if(pwNotice) pwNotice.style.display='none'; return; }
+  if(pwLabel) pwLabel.textContent='Password';
+  if(pwNotice) pwNotice.style.display='none';
+  // Refine label once Firebase confirms if it's their first time
   try {
     const snap=await get(studentPwRef(id));
     if(!snap.val()) {
-      pwLabel.textContent='Create a password (first time)';
-      pwNotice.style.display='block';
-      pwNotice.textContent='🔑 First time logging in. Create a password — you will use it every race.';
+      if(pwLabel) pwLabel.textContent='Create a password (first time)';
+      if(pwNotice){ pwNotice.style.display='block'; pwNotice.textContent='🔑 First time logging in. Create a password — you will use it every race.'; }
     }
   } catch(e) { /* Firebase not ready yet — password field still shown */ }
 }
