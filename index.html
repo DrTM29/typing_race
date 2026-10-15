@@ -202,11 +202,7 @@ select.field-select:focus{border-color:var(--accent);}
       <div class="role-btn" id="roleHost" onclick="setRole('host')">Host / Teacher</div>
     </div>
     <div id="studentNoRoom">
-      <p style="font-size:14px;color:var(--text3);margin-bottom:1rem;">Ask your teacher for the room link, or enter a room name below.</p>
-      <div class="field-group">
-        <label class="field-label">Room name</label>
-        <input class="field-input" id="studentRoomInput" type="text" placeholder="e.g. Grade7A" maxlength="40"/>
-      </div>
+      <p style="font-size:14px;color:var(--text3);margin-bottom:1rem;">Ask your teacher for the room link to join a race.</p>
       <div class="field-group">
         <label class="field-label">Class</label>
         <select class="field-input" id="studentClassHome" onchange="populateStudentIdDropdown('studentClassHome','studentIdHome')">
@@ -248,9 +244,6 @@ select.field-select:focus{border-color:var(--accent);}
         <button class="btn-sm" onclick="createRoom()" style="padding:10px 16px;">Create</button>
       </div>
     </div>
-    <div class="divider"></div>
-    <h3 style="font-size:13px;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em;">Your rooms</h3>
-    <div id="roomsGrid"><div class="empty-state" style="padding:1rem;">Loading…</div></div>
     <div class="divider"></div>
     <button class="btn-link" onclick="showScreen('screenHome')">← Back</button>
   </div>
@@ -1337,11 +1330,9 @@ async function renderRaceHistory() {
   const allResults=Object.values(resultsSnap.val()||{});
   if(!history.length){container.innerHTML='<div class="empty-state" style="padding:1rem;">No races yet in this room.</div>';return;}
   container.innerHTML=history.map(race=>{
-    const top=allResults.filter(r=>r.raceNum===race.raceNum).sort((a,b)=>b.wpm-a.wpm).slice(0,3);
+    const top=allResults.filter(r=>r.raceNum===race.raceNum).sort((a,b)=>{const sa=a.score!==undefined?a.score:Math.round(a.wpm*((a.acc||100)/100));const sb=b.score!==undefined?b.score:Math.round(b.wpm*((b.acc||100)/100));return sb-sa;}).slice(0,3);
     const date=race.ts ? new Date(race.ts).toLocaleString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-    const podium=top.map((r,i)=>
-      `<span style="font-size:13px;color:var(--text2);">${['🥇','🥈','🥉'][i]} ${esc(r.id)} <span style="color:var(--accent);font-weight:600;">${r.wpm} wpm</span></span>`
-    ).join('<span style="color:var(--border2);margin:0 6px;">·</span>');
+    const podium=top.map((r,i)=>{const sc=r.score!==undefined?r.score:Math.round(r.wpm*((r.acc||100)/100));return`<span style="font-size:13px;color:var(--text2);">${['🥇','🥈','🥉'][i]} ${esc(r.id)} <span style="color:var(--accent);font-weight:600;">${r.wpm} wpm</span> <span style="color:var(--green);font-size:12px;">${r.acc||100}% → ${sc}pts</span></span>`;}).join('<span style="color:var(--border2);margin:0 6px;">·</span>');
     return `<div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
         <span style="font-size:13px;font-weight:600;color:var(--text);">Race #${race.raceNum}</span>
