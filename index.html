@@ -459,15 +459,6 @@ select.field-select:focus{border-color:var(--accent);}
           </div>
         </div>
       </div>
-      <div class="host-section">
-        <h3>All rooms</h3>
-        <div id="allRoomsGrid"></div>
-        <div class="divider"></div>
-        <div style="display:flex;gap:8px;">
-          <input class="add-input" id="newRoomFromHost" type="text" placeholder="New room name…" maxlength="40" style="flex:1;"/>
-          <button class="btn-sm" onclick="createRoomFromHost()" style="padding:10px 16px;">Create</button>
-        </div>
-      </div>
     </div>
 
     <!-- ANALYTICS TAB -->
@@ -489,6 +480,12 @@ select.field-select:focus{border-color:var(--accent);}
       <!-- Per-class stats -->
       <div id="analyticsClassContent">
         <div class="empty-state">Select a class above to see detailed analytics.</div>
+      </div>
+
+      <!-- Race history -->
+      <div class="chart-wrap" style="margin-top:2rem;">
+        <h4>Race history — this room</h4>
+        <div id="raceHistoryList"><div class="empty-state" style="padding:1rem;">No races yet.</div></div>
       </div>
     </div>
 
@@ -545,6 +542,7 @@ function classesRef()         { return ref(db, 'classes'); }
 function classRef(name)       { return ref(db, 'classes/' + safeid(name)); }
 function studentPwRef(id)     { return ref(db, 'students/' + safeid(id) + '/password'); }
 function studentResultsRef(id){ return ref(db, 'students/' + safeid(id) + '/results'); }
+function raceHistoryRef(room)  { return ref(db, 'rooms/' + room + '/raceHistory'); }
 function safeid(s)            { return String(s).replace(/[.#$\[\]\/]/g, '_'); }
 function esc(s)               { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function getRoomUrl(room)     { return window.location.origin + window.location.pathname + '?room=' + encodeURIComponent(room); }
@@ -690,21 +688,23 @@ function setupPasswordCheck() {
 async function checkStudentPwFromDropdown() {
   if(myRole!=='student') return;
   const id=(document.getElementById('loginIdSelect')||{}).value||'';
-  if(!id) { document.getElementById('studentPwSection').style.display='none'; return; }
-  const snap=await get(studentPwRef(id));
-  const existingPw=snap.val();
   const pwSection=document.getElementById('studentPwSection');
   const pwNotice=document.getElementById('studentPwNotice');
   const pwLabel=document.getElementById('studentPwLabel');
+  if(!id) { pwSection.style.display='none'; return; }
+  // Show immediately so the student can start typing their password
   pwSection.style.display='block';
-  if(existingPw) {
-    pwLabel.textContent='Password';
-    pwNotice.style.display='none';
-  } else {
-    pwLabel.textContent='Create a password (first time)';
-    pwNotice.style.display='block';
-    pwNotice.textContent='🔑 First time logging in. Create a password — you will use it every race.';
-  }
+  pwLabel.textContent='Password';
+  pwNotice.style.display='none';
+  // Then refine label once Firebase confirms if it's their first time
+  try {
+    const snap=await get(studentPwRef(id));
+    if(!snap.val()) {
+      pwLabel.textContent='Create a password (first time)';
+      pwNotice.style.display='block';
+      pwNotice.textContent='🔑 First time logging in. Create a password — you will use it every race.';
+    }
+  } catch(e) { /* Firebase not ready yet — password field still shown */ }
 }
 async function checkStudentPw() { await checkStudentPwFromDropdown(); }
 
@@ -1318,13 +1318,39 @@ async function renderAnalytics() {
   const classKeys=Object.keys(cachedClasses);
   if(!classKeys.length){
     document.getElementById('analyticsClassContent').innerHTML='<div class="empty-state">No classes loaded yet.</div>';
-    return;
+  } else {
+    renderAnalyticsTabs();
+    await buildClassCompareChart(classKeys);
+    if(!activeAnalyticsClass) { activeAnalyticsClass=classKeys[0]; }
+    await renderClassDetail(activeAnalyticsClass);
   }
-  renderAnalyticsTabs();
-  // Build class-comparison bar chart (avg WPM per class)
-  await buildClassCompareChart(classKeys);
-  if(!activeAnalyticsClass) { activeAnalyticsClass=classKeys[0]; }
-  await renderClassDetail(activeAnalyticsClass);
+  await renderRaceHistory();
+}
+
+async function renderRaceHistory() {
+  const container=document.getElementById('raceHistoryList'); if(!container) return;
+  const [histSnap, resultsSnap] = await Promise.all([
+    get(raceHistoryRef(currentRoom)),
+    get(resultsRef(currentRoom))
+  ]);
+  const history=Object.values(histSnap.val()||{}).sort((a,b)=>b.raceNum-a.raceNum);
+  const allResults=Object.values(resultsSnap.val()||{});
+  if(!history.length){container.innerHTML='<div class="empty-state" style="padding:1rem;">No races yet in this room.</div>';return;}
+  container.innerHTML=history.map(race=>{
+    const top=allResults.filter(r=>r.raceNum===race.raceNum).sort((a,b)=>b.wpm-a.wpm).slice(0,3);
+    const date=race.ts ? new Date(race.ts).toLocaleString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+    const podium=top.map((r,i)=>
+      `<span style="font-size:13px;color:var(--text2);">${['🥇','🥈','🥉'][i]} ${esc(r.id)} <span style="color:var(--accent);font-weight:600;">${r.wpm} wpm</span></span>`
+    ).join('<span style="color:var(--border2);margin:0 6px;">·</span>');
+    return `<div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+        <span style="font-size:13px;font-weight:600;color:var(--text);">Race #${race.raceNum}</span>
+        <span style="font-size:12px;color:var(--text4);">${date}${race.raceClass?' · '+esc(race.raceClass):''}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:6px;font-style:italic;">"${esc((race.text||'').slice(0,120))}${(race.text||'').length>120?'…':''}"</div>
+      ${podium?`<div style="display:flex;flex-wrap:wrap;gap:8px;">${podium}</div>`:'<div style="font-size:12px;color:var(--text4);">No results recorded</div>'}
+    </div>`;
+  }).join('');
 }
 
 async function buildClassCompareChart(classKeys) {
@@ -1580,6 +1606,8 @@ window.startRace = async () => {
   const raceClass=(document.getElementById('raceClassSelect')||{}).value||'';
   await set(racersRef(currentRoom),null);
   await update(stateRef(currentRoom),{status:'countdown',text:chosen,raceNum:rn,startAt:raceStartsAt,timerEndAt:timerEndAt||null,raceClass:raceClass||null});
+  // Save to race history for analytics
+  await push(raceHistoryRef(currentRoom),{raceNum:rn,text:chosen,raceClass:raceClass||'',ts:new Date().toISOString()});
   const btn=document.getElementById('startRaceBtn');
   btn.textContent='Started ✓'; btn.className='btn-started'; btn.onclick=null;
   toast('Race starting in 3…');
