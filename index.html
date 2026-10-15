@@ -1238,7 +1238,7 @@ function renderRosterContent() {
     <div style="overflow-x:auto;">
     <table class="student-table">
       <thead><tr>
-        <th>#</th><th>Student ID</th><th>Has Password</th><th>Remove</th>
+        <th>#</th><th>Student ID</th><th>Password</th><th>Reset PW</th><th>Remove</th>
       </tr></thead>
       <tbody id="rosterTableBody"></tbody>
     </table>
@@ -1251,6 +1251,7 @@ function renderRosterContent() {
       <td style="color:var(--text3);">${i+1}</td>
       <td>${esc(sid)}</td>
       <td id="pwStatus_${esc(safeid(sid))}" style="color:var(--text4);">…</td>
+      <td><button class="btn-sm" style="font-size:11px;padding:3px 8px;" onclick="window.resetStudentPw('${esc(sid)}')">Reset</button></td>
       <td><button class="btn-del" onclick="window.removeStudentFromClass('${esc(activeRosterClass)}',${i},'${esc(sid)}')">✕</button></td>
     </tr>`).join('');
 
@@ -1261,6 +1262,14 @@ function renderRosterContent() {
     if(el) el.innerHTML=snap.val() ? '<span style="color:var(--green);">✓ Set</span>' : '<span style="color:var(--text4);">Not set</span>';
   });
 }
+
+window.resetStudentPw = async (sid) => {
+  if(!confirm('Reset password for "'+sid+'"? They will create a new one on next login.')) return;
+  await set(studentPwRef(sid), null);
+  const el=document.getElementById('pwStatus_'+safeid(sid));
+  if(el) el.innerHTML='<span style="color:var(--text4);">Not set</span>';
+  toast('Password reset for '+sid);
+};
 
 window.removeStudentFromClass = async (classKey, index, sid) => {
   if(!confirm('Remove "'+sid+'" from this class?')) return;
