@@ -613,7 +613,7 @@ window.setRoleRoom = r => {
   document.getElementById('hostIdField').style.display = r==='host'?'block':'none';
   document.getElementById('studentClassIdSection').style.display = r==='student'?'block':'none';
   document.getElementById('emojiPickerSection').style.display = r==='student'?'block':'none';
-  document.getElementById('studentPwSection').style.display = 'none';
+  document.getElementById('studentPwSection').style.display = r==='student'?'block':'none';
   if(r==='student') populateClassDropdowns();
 };
 
