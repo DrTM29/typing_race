@@ -401,9 +401,16 @@ select.field-select:focus{border-color:var(--accent);}
       <div class="host-section">
         <h3>Race controls</h3>
         <div class="field-group" style="margin-bottom:1rem;">
+          <label class="field-label">Class for this race</label>
+          <select class="field-input" id="raceClassSelect" style="margin-bottom:.75rem;">
+            <option value="">— All classes (no filter) —</option>
+          </select>
           <label class="field-label">Sentence for next race <span style="color:var(--text4);font-weight:400;font-size:12px;">(up to 150 words)</span></label>
           <textarea class="add-input" id="sentenceSelect" rows="4" placeholder="Type or paste the sentence / passage here…" maxlength="2000" style="resize:vertical;width:100%;font-size:14px;line-height:1.6;"></textarea>
-          <div id="wordCountDisplay" style="font-size:12px;color:var(--text4);margin-top:4px;text-align:right;">0 words</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+            <button class="btn-sm" onclick="saveSentence()" id="saveSentenceBtn" style="font-size:12px;padding:5px 14px;">💾 Save sentence</button>
+            <div id="wordCountDisplay" style="font-size:12px;color:var(--text4);">0 words</div>
+          </div>
         </div>
         <div class="field-group" style="margin-bottom:1rem;">
           <label class="field-label">Race timer (optional)</label>
@@ -640,6 +647,21 @@ function populateClassDropdowns() {
     }
   });
 }
+function populateRaceClassDropdown() {
+  const sel=document.getElementById('raceClassSelect'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— All classes (no filter) —</option>';
+  const names=Object.keys(cachedClasses).length
+    ? Object.values(cachedClasses).map(c=>c.name)
+    : Object.keys(DEFAULT_CLASSES);
+  names.forEach(name=>{
+    const opt=document.createElement('option');
+    opt.value=name; opt.textContent=name;
+    if(name===cur) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
 window.populateStudentIdDropdown = (classSelId, idSelId) => {
   const classSel=document.getElementById(classSelId);
   const idSel=document.getElementById(idSelId);
@@ -886,6 +908,7 @@ function subscribeToRoom() {
       renderRosterTabs();
       renderAnalyticsTabs();
       populateClassDropdowns(); // refresh student login dropdowns
+      populateRaceClassDropdown(); // refresh host race-class selector
     });
   }
 }
@@ -1190,6 +1213,7 @@ function renderAllRooms(rooms) {
         <div class="room-row-link">${esc(getRoomUrl(r))}</div>
       </div>
       <button class="copy-btn" style="padding:5px 12px;font-size:12px;" onclick="window.copyRoomLink('${esc(r)}')">Copy</button>
+      <button class="btn-sm" style="background:var(--red-bg);color:var(--red);border-color:var(--red);padding:5px 10px;font-size:12px;" onclick="window.deleteRoom('${esc(r)}')">Delete</button>
     </div>`).join(''):'<div class="empty-state" style="padding:1rem;">No rooms.</div>';
 }
 
@@ -1472,6 +1496,7 @@ async function loadRoomsForDashboard() {
         <div style="flex:1;min-width:0;"><div class="room-row-name">${esc(r)}</div><div class="room-row-link">${esc(getRoomUrl(r))}</div></div>
         <button class="copy-btn" style="padding:6px 14px;font-size:12px;" onclick="window.copyRoomLink('${esc(r)}')">Copy</button>
         <button class="btn-sm" onclick="window.enterRoom('${esc(r)}')">Enter</button>
+        <button class="btn-sm" style="background:var(--red-bg);color:var(--red);border-color:var(--red);padding:6px 12px;font-size:12px;" onclick="window.deleteRoom('${esc(r)}')">Delete</button>
       </div>`).join(''):'<div class="empty-state" style="padding:1rem;">No rooms yet.</div>';
   });
 }
@@ -1490,6 +1515,14 @@ window.createRoom = async () => {
 };
 
 window.enterRoom = r => { currentRoom=r; myRole='host'; myId='Host'; launchApp(); };
+
+window.deleteRoom = async (r) => {
+  if(!confirm('Delete room "'+r+'"? This removes it from the list but keeps its race history in Firebase.')) return;
+  const ri=await get(roomsIndexRef());
+  const idx=(ri.val()||[]).filter(x=>x!==r);
+  await set(roomsIndexRef(),idx);
+  toast('Room "'+r+'" deleted.');
+};
 
 window.createRoomFromHost = async () => {
   const name=slugify(document.getElementById('newRoomFromHost').value);
@@ -1520,6 +1553,18 @@ window.removeSentence = async i => {
 };
 
 // ── Race controls ─────────────────────────────────────────────────────────────
+window.saveSentence = async () => {
+  const ta=document.getElementById('sentenceSelect');
+  const text=(ta&&ta.value.trim())||'';
+  if(!text){toast('Type a sentence first!');return;}
+  const wordCount=text.split(/\s+/).filter(Boolean).length;
+  if(wordCount>150){toast('Too long — keep it under 150 words (currently '+wordCount+')');return;}
+  await update(stateRef(currentRoom),{text});
+  const btn=document.getElementById('saveSentenceBtn');
+  if(btn){const orig=btn.textContent;btn.textContent='Saved ✓';setTimeout(()=>{btn.textContent=orig;},1500);}
+  toast('Sentence saved.');
+};
+
 window.startRace = async () => {
   const ta=document.getElementById('sentenceSelect');
   const chosen=(ta&&ta.value.trim())||'';
@@ -1532,8 +1577,9 @@ window.startRace = async () => {
   const timerDuration=(mins*60+secs)*1000;
   const raceStartsAt=Date.now()+3000;
   const timerEndAt=timerDuration>0 ? raceStartsAt+timerDuration : null;
+  const raceClass=(document.getElementById('raceClassSelect')||{}).value||'';
   await set(racersRef(currentRoom),null);
-  await update(stateRef(currentRoom),{status:'countdown',text:chosen,raceNum:rn,startAt:raceStartsAt,timerEndAt:timerEndAt||null});
+  await update(stateRef(currentRoom),{status:'countdown',text:chosen,raceNum:rn,startAt:raceStartsAt,timerEndAt:timerEndAt||null,raceClass:raceClass||null});
   const btn=document.getElementById('startRaceBtn');
   btn.textContent='Started ✓'; btn.className='btn-started'; btn.onclick=null;
   toast('Race starting in 3…');
