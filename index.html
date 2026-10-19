@@ -1344,9 +1344,24 @@ async function renderRaceHistory() {
   const allResults=Object.values(resultsSnap.val()||{});
   if(!history.length){container.innerHTML='<div class="empty-state" style="padding:1rem;">No races yet in this room.</div>';return;}
   container.innerHTML=history.map(race=>{
-    const top=allResults.filter(r=>r.raceNum===race.raceNum).sort((a,b)=>{const sa=a.score!==undefined?a.score:Math.round(a.wpm*((a.acc||100)/100));const sb=b.score!==undefined?b.score:Math.round(b.wpm*((b.acc||100)/100));return sb-sa;}).slice(0,3);
+    const raceResults=allResults.filter(r=>r.raceNum===race.raceNum);
+    const top=[...raceResults].sort((a,b)=>{const sa=a.score!==undefined?a.score:Math.round(a.wpm*((a.acc||100)/100));const sb=b.score!==undefined?b.score:Math.round(b.wpm*((b.acc||100)/100));return sb-sa;}).slice(0,3);
     const date=race.ts ? new Date(race.ts).toLocaleString('ja-JP',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-    const podium=top.map((r,i)=>{const sc=r.score!==undefined?r.score:Math.round(r.wpm*((r.acc||100)/100));return`<span style="font-size:13px;color:var(--text2);">${['🥇','🥈','🥉'][i]} ${esc(r.id)} <span style="color:var(--accent);font-weight:600;">${r.wpm} wpm</span> <span style="color:var(--green);font-size:12px;">${r.acc||100}% → ${sc}pts</span></span>`;}).join('<span style="color:var(--border2);margin:0 6px;">·</span>');
+    const podium=top.map((r,i)=>{const sc=r.score!==undefined?r.score:Math.round(r.wpm*((r.acc||100)/100));return`<span style="font-size:13px;color:var(--text2);">${['🥇','🥈','🥉'][i]} ${esc(r.name||r.id)} <span style="color:var(--accent);font-weight:600;">${r.wpm} wpm</span> <span style="color:var(--green);font-size:12px;">${r.acc||100}% → ${sc}pts</span></span>`;}).join('<span style="color:var(--border2);margin:0 6px;">·</span>');
+    // Mini histogram for this race
+    const buckets=[{l:'<20',min:0,max:19},{l:'20–39',min:20,max:39},{l:'40–59',min:40,max:59},{l:'60–79',min:60,max:79},{l:'80–99',min:80,max:99},{l:'100+',min:100,max:9999}];
+    const counts=buckets.map(b=>({...b,n:raceResults.filter(r=>r.wpm>=b.min&&r.wpm<=b.max).length}));
+    const maxN=Math.max(...counts.map(c=>c.n),1);
+    const histBars=counts.map(c=>{
+      const h=Math.round((c.n/maxN)*60);
+      const col=c.min>=80?'var(--green)':c.min>=40?'var(--blue)':'var(--text4)';
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;">
+        <div style="font-size:10px;color:var(--text3);">${c.n||''}</div>
+        <div style="width:100%;background:${col};border-radius:3px 3px 0 0;height:${h}px;min-height:${c.n?3:0}px;"></div>
+        <div style="font-size:10px;color:var(--text4);white-space:nowrap;">${c.l}</div>
+      </div>`;
+    }).join('');
+    const hist=raceResults.length ? `<div style="margin-top:8px;"><div style="font-size:11px;color:var(--text4);margin-bottom:4px;">WPM distribution (${raceResults.length} finishers)</div><div style="display:flex;gap:4px;height:80px;align-items:flex-end;">${histBars}</div></div>` : '';
     return `<div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
         <span style="font-size:13px;font-weight:600;color:var(--text);">Race #${race.raceNum}</span>
@@ -1354,6 +1369,7 @@ async function renderRaceHistory() {
       </div>
       <div style="font-size:13px;color:var(--text2);margin-bottom:6px;font-style:italic;">"${esc((race.text||'').slice(0,120))}${(race.text||'').length>120?'…':''}"</div>
       ${podium?`<div style="display:flex;flex-wrap:wrap;gap:8px;">${podium}</div>`:'<div style="font-size:12px;color:var(--text4);">No results recorded</div>'}
+      ${hist}
     </div>`;
   }).join('');
 }
