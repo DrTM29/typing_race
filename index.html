@@ -813,19 +813,27 @@ async function seedDefaultClasses() {
 
 async function reseedClasses() {
   document.getElementById('reseedConfirm').style.display='none';
-  toast('⏳ Reseeding…');
-  try {
-    const payload={};
-    for(const [className, students] of Object.entries(DEFAULT_CLASSES)) {
-      payload[safeid(className)] = { name: className, students: students };
+  const statusEl = document.createElement('div');
+  statusEl.style.cssText='background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px;font-size:13px;';
+  statusEl.textContent='⏳ Reseeding classes…';
+  document.getElementById('rosterContent').prepend(statusEl);
+  const errors=[];
+  for(const [className, students] of Object.entries(DEFAULT_CLASSES)) {
+    const key=safeid(className);
+    try {
+      await set(ref(db,'classes/'+key), { name: className, students: students });
+      statusEl.textContent='✓ Updated: '+className;
+    } catch(e) {
+      errors.push(className+': '+e.message);
+      statusEl.textContent='✗ Failed: '+className+' — '+e.message;
     }
-    console.log('reseedClasses payload:', JSON.stringify(payload).slice(0,200));
-    await set(classesRef(), payload);
-    toast('✓ Class rosters reset to correct lists');
-    alert('Done! Tue3 Fri3 now has 18 students, Fri 5 has 28. Reload the page to see the changes.');
-  } catch(e) {
-    console.error('reseedClasses error:', e);
-    alert('ERROR: ' + e.message);
+  }
+  if(errors.length===0){
+    statusEl.style.borderColor='var(--green)';
+    statusEl.textContent='✅ All class rosters corrected! Tue3 Fri3 = 18 students, Fri 5 = 28 students.';
+  } else {
+    statusEl.style.borderColor='var(--red,#f87171)';
+    statusEl.innerHTML='<strong>Errors:</strong><br>'+errors.join('<br>');
   }
 }
 
