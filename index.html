@@ -813,12 +813,20 @@ async function seedDefaultClasses() {
 
 async function reseedClasses() {
   document.getElementById('reseedConfirm').style.display='none';
-  const payload={};
-  for(const [className, students] of Object.entries(DEFAULT_CLASSES)) {
-    payload[safeid(className)] = { name: className, students: students };
+  toast('⏳ Reseeding…');
+  try {
+    const payload={};
+    for(const [className, students] of Object.entries(DEFAULT_CLASSES)) {
+      payload[safeid(className)] = { name: className, students: students };
+    }
+    console.log('reseedClasses payload:', JSON.stringify(payload).slice(0,200));
+    await set(classesRef(), payload);
+    toast('✓ Class rosters reset to correct lists');
+    alert('Done! Tue3 Fri3 now has 18 students, Fri 5 has 28. Reload the page to see the changes.');
+  } catch(e) {
+    console.error('reseedClasses error:', e);
+    alert('ERROR: ' + e.message);
   }
-  await set(classesRef(), payload);
-  toast('✓ Class rosters reset to correct lists');
 }
 
 async function launchApp() {
