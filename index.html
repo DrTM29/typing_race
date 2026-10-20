@@ -450,6 +450,7 @@ select.field-select:focus{border-color:var(--accent);}
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
           <input class="add-input" id="newClassName" type="text" placeholder="New class name…" maxlength="40" style="flex:1;min-width:140px;"/>
           <button class="btn-sm" onclick="addNewClass()" style="padding:10px 16px;">Add class</button>
+          <button class="btn-sm" onclick="reseedClasses()" style="padding:10px 16px;background:var(--red-bg,#3a1a1a);color:var(--red,#f87171);border-color:var(--red,#f87171);" title="Overwrite all class rosters in Firebase with the built-in correct lists">↺ Re-seed rosters</button>
         </div>
         <div id="addStudentToClassWrap" style="display:none;">
           <label class="field-label" style="margin-top:8px;">Add student to <strong id="addStudentClassName"></strong></label>
@@ -801,6 +802,16 @@ async function seedDefaultClasses() {
   }
   await set(classesRef(), payload);
   toast('Class rosters loaded ✓');
+}
+
+async function reseedClasses() {
+  if(!confirm('⚠️ This will OVERWRITE all class rosters in Firebase with the built-in correct lists.\n\nAny manual changes you made (added/removed students) will be lost.\n\nContinue?')) return;
+  const payload={};
+  for(const [className, students] of Object.entries(DEFAULT_CLASSES)) {
+    payload[safeid(className)] = { name: className, students: students };
+  }
+  await set(classesRef(), payload);
+  toast('✓ Class rosters reset to correct lists');
 }
 
 async function launchApp() {
